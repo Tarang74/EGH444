@@ -1,0 +1,645 @@
+%!TEX TS-program = xelatex
+%!TEX options = -aux-directory=Debug -shell-escape -file-line-error -interaction=nonstopmode -halt-on-error -synctex=1 "%DOC%"
+\documentclass{article}
+\input{LaTeX-Submodule/template.tex}
+
+% Additional packages & macros
+
+% Header and footer
+\newcommand{\unitName}{Digital Signals and Image Processing}
+\newcommand{\unitTime}{Semester 2, 2024}
+\newcommand{\unitCoordinator}{Dr Maryam Haghighat}
+\newcommand{\documentAuthors}{Tarang Janawalkar}
+
+\fancyhead[L]{\unitName}
+\fancyhead[R]{\parbox[b]{9cm}{\raggedleft\leftmark}}
+\fancyfoot[C]{\thepage}
+
+% Copyright
+\usepackage[
+    type={CC},
+    modifier={by-nc-sa},
+    version={4.0},
+    imagewidth={5em},
+    hyphenation={raggedright}
+]{doclicense}
+
+\date{}
+
+\begin{document}
+%
+\begin{titlepage}
+    \vspace*{\fill}
+    \begin{center}
+        \LARGE{\textbf{\unitName}} \\[0.1in]
+        \normalsize{\unitTime} \\[0.2in]
+        \normalsize\textit{\unitCoordinator} \\[0.2in]
+        \documentAuthors
+    \end{center}
+    \vspace*{\fill}
+    \doclicenseThis
+    \thispagestyle{empty}
+\end{titlepage}
+\newpage
+%
+\tableofcontents
+\newpage
+%
+\section{Digital Image Processing}
+Digital image processing is the processing of images on a digital
+system using algorithms. A digital image is a binary representation of
+visual data that is composed of a finite number of elements, each with
+a particular location and value.
+
+Image processing methods can be divided into two categories:
+\begin{itemize}
+    \item Methods where the input and output are images.
+    \item Methods where the input is an image and the output is some
+          information extracted from the image.
+\end{itemize}
+\subsection{Elements of Visual Perception}
+The human visual system has influenced and contributed to many
+advancements in image processing. The human eye has light receptors
+called rods and cones. Humans have around \numrange{6}{7} million cones
+in each eye that are highly sensitive to colour and fine details. On
+the other hand, there are a total of \numrange{75}{150} million rods
+across both eyes, that are sensitive to low levels of illumination.
+\subsubsection{Image Formation}
+Photo camera lenses are fixed in focal length and they focus at various
+distances by varying the distance between the lens and imaging plane
+(film/chip). The human eye works in the opposite way, where the
+distance between the lens and the imaging plane (retina) is fixed, but
+the focal length for focus is varied by changing the shape of the lens.
+\subsubsection{Brightness Adaptation and Discrimination}
+The human eye is capable of discriminating between a wide range of
+intensity levels. This range of light intensity levels is on the order
+of \(10^{10}\).
+\subsection{Image Generation Components}
+There are three components to image generation:
+\begin{itemize}
+    \item \textbf{Object}: The object being imaged.
+    \item \textbf{Energy Source}: The source of energy that illuminates the object.
+    \item \textbf{Sensor}: The sensor that detects the energy reflected from the object.
+\end{itemize}
+Depending on the properties of the energy source and object material and
+geometry, the emitted energy can be reflected, transmitted, or absorbed.
+\subsubsection{Electromagnetic Spectrum}
+The main source of energy for imaging is electromagnetic (EM)
+radiation. EM radiation consists of propagating sinusoidal waves
+characterised by their oscillating frequency \(f\). Using Planck's
+equation, the energy of a photon can be calculated as
+\begin{equation*}
+    E = hf
+\end{equation*}
+where \(h = \qty{6.62607015E-34}{J.s}\) is Planck's constant and \(f\) is the frequency of the wave.
+Given the speed of light \(c = \qty{299792458}{m.s^{-1}}\), we can also calculate the energy using
+\begin{equation*}
+    E = \frac{hc}{\lambda}.
+\end{equation*}
+The EM spectrum is divided into regions based on the frequency of the
+waves. The visible light spectrum is a small part of the EM spectrum
+that is visible to the human eye. The visible light spectrum ranges
+from \qty{380}{nm} to \qty{700}{nm}. Earth's atmosphere also blocks
+certain parts of the EM spectrum, such as short wavelength UV and X-rays.
+
+\textbf{Perceived colour} (hue) is related to the wavelength of light,
+while the \textbf{brightness} is related to the intensity of the
+radiation.
+\subsubsection{Image Sensors}
+Image sensors capture a specific range of the EM spectrum, for example:
+\begin{itemize}
+    \item RGB sensors capture the visible light spectrum.
+    \item Infrared sensors capture the infrared spectrum.
+    \item X-ray sensors capture the X-ray spectrum.
+    \item Ultraviolet sensors capture the ultraviolet spectrum.
+\end{itemize}
+\subsubsection{Human Perception}
+Human perception is context-dependent. Perceived intensity around
+regions of discontinuous intensity appear to undershoot and overshoot
+around the boundary (see Mach band effect). The eye can also fill in
+non-existing information and wrongly perceive geometrical properties of
+objects. To produce a powerful vision system, we need both a powerful
+image sensor and image processor to extract useful information from an
+image.
+\subsection{Image Sensing and Acquisition}
+Image sensing is the process of transforming illuminated energy into a
+digital image. The process involves the following steps:
+\begin{enumerate}
+    \item Convert the illuminated energy into an electrical signal.
+    \item Digitize the electrical signal to obtain a digital image.
+\end{enumerate}
+\subsubsection{Image Sensing Modalities}
+Image sensing is done using three principal modalities:
+\begin{itemize}
+    \item \textbf{Single Sensing Element}: A single sensor that
+          captures the energy. For example, a photodiode. To
+          generate 2D images, the sensor must be appropriately
+          displaced in the \(x\) and \(y\) directions.
+    \item \textbf{Line Sensor}: A sensor that captures energy
+          along a line. To generate 2D images, the sensor must
+          be displaced in the direction perpendicular to the
+          line.
+    \item \textbf{Array Sensor}: A sensor that captures energy
+          in a 2D array. The sensor is divided into rows and
+          columns, with each element capturing energy at a
+          specific location. A typical arrangement is the
+          \textbf{CCD} (Charge Coupled Device) sensor.
+\end{itemize}
+\subsubsection{Image Formation}
+Let us denote the intensity of a monochrome image by the 2-dimensional
+function
+\begin{equation*}
+    \ell = f\left( x,\: y \right)
+\end{equation*}
+where \(x\) and \(y\) represent the spatial coordinates captured by the
+sensor, and \(f\) is a scalar function of the intensity of the energy
+radiated by a physical source. As such, this function is non-negative
+and finite:
+\begin{equation*}
+    0 \leqslant \ell \leqslant \infty.
+\end{equation*}
+\(f\) is characterised by two components:
+\begin{itemize}
+    \item \textbf{Illumination}: The amount of source illumination incident on the
+          scene \(i\left( x,\: y \right)\). Here \(0 \leqslant i\left( x,\: y \right) < \infty\).
+    \item \textbf{Reflectance}: The amount of illumination reflected by
+          the objects on the scene \(r\left( x,\: y \right)\). Here
+          \(0 \leqslant r\left( x,\: y \right) \leqslant 1\).
+\end{itemize}
+Therefore, we can describe the image formation process as
+\begin{equation*}
+    f\left( x,\: y \right) = i\left( x,\: y \right) r\left( x,\: y \right),
+\end{equation*}
+where \(r = 0\) implies total absorption, while \(r = 1\) implies total reflectance.
+For monochrome images, we can define the minimum and maximum intensity
+values as \(L_{\text{min}}\) and \(L_{\text{max}}\), respectively,
+where
+\begin{equation*}
+    L_{\text{min}} \leqslant \ell \leqslant L_{\text{max}}, \quad L_{\text{min}} = i_{\text{min}} r_{\text{min}}, \quad L_{\text{max}} = i_{\text{max}} r_{\text{max}}.
+\end{equation*}
+The range of intensity values \(\interval{L_{\text{min}}}{L_{\text{max}}}\)
+is called the \textbf{intensity/gray scale}. Commonly, this interval is
+transformed to the interval \(\interval{0}{L-1}\), where \(L\) is the
+number of intensity levels.
+\subsection{Image Sampling and Quantisation}
+\textbf{Image sampling} is the process of sampling discrete points in a
+continuous image. Regardless of the sensor arrangement, the image is
+sampled at a fixed rate in the \(x\) and \(y\) directions and the
+resulting points are called \textbf{pixels}. These pixels are stored in
+an array that is \(M \times N\) in size, where \(M\) is the number of
+rows and \(N\) is the number of columns, arranged as shown below:
+\begin{equation*}
+    \symbf{X} =
+    \begin{bmatrix}
+        x_{00}    & x_{01}    & \cdots & x_{0,N-1}   \\
+        x_{10}    & x_{11}    & \cdots & x_{1,N-1}   \\
+        \vdots    & \vdots    & \ddots & \vdots      \\
+        x_{M-1,0} & x_{M-1,1} & \cdots & x_{M-1,N-1}
+    \end{bmatrix}
+\end{equation*}
+\textbf{Image quantisation} is the process of converting the continuous
+intensity values of an image to discrete values. The number of
+intensity levels \(L\) is determined by the number of bits used to
+represent each pixel. The number of intensity levels is given by
+\begin{equation*}
+    L = 2^k,
+\end{equation*}
+where \(k\) is the bit depth. Thus the quantised intensity values will
+range from \(\interval{0}{L-1}\). The \textbf{quality} of an image is
+determine by the number of discrete intensity levels used in both
+sampling and quantisation.
+\subsubsection{Dynamic Range and Contrast}
+The \textbf{dynamic range} of an image is the ratio of the maximum
+intensity value to the minimum intensity value:
+\begin{equation*}
+    \text{Dynamic Range} = \frac{L_{\text{max}}}{L_{\text{min}}} = \frac{i_{\text{max}} r_{\text{max}}}{i_{\text{min}} r_{\text{min}}}.
+\end{equation*}
+The upper limit is determined by the sensor's saturation level, while
+the lower limit is determined by the sensor's noise level. The
+\textbf{contrast} of an image is the difference in intensity between the
+brightest and darkest regions of the image:
+\begin{equation*}
+    \text{Contrast} = L_{\text{max}} - L_{\text{min}} = i_{\text{max}} r_{\text{max}} - i_{\text{min}} r_{\text{min}}.
+\end{equation*}
+\begin{itemize}
+    \item A \textbf{high} dynamic range implies a large difference
+          between the brightest and darkest regions of the image, and
+          therefore high contrast.
+    \item A \textbf{low} dynamic range implies a small difference
+          between the brightest and darkest regions of the image, and
+          therefore low contrast.
+\end{itemize}
+\subsubsection{Spatial and Intensity Resolution}
+The \textbf{spatial resolution} of an image is a measure of the
+smallest discernible detail in an image, measured as the number of
+pixels per unit area (dots per inch). In some images, sampling an image
+at a low rate can result in \textbf{aliasing}, where high-frequency
+components are incorrectly represented as low-frequency components (see
+the Moiré pattern).
+
+The \textbf{intensity resolution} of an image is the smallest
+discernible change in intensity level, which is related to the number
+of intensity levels used to represent the image, for example, 8-bit and
+10-bit images. Choosing a low number of intensity levels can result in
+quantisation noise, where intensity levels are incorrectly represented.
+\subsubsection{Image Interpolation}
+Image interpolation is the process of estimating the intensity values
+of pixels between the sampled points. Interpolation is used to increase
+and decrease the resolution of an image for resampling and resizing.
+Common interpolation methods include:
+\begin{itemize}
+    \item \textbf{Nearest Neighbour}: The intensity value of the nearest
+          pixel is used to estimate the intensity value of the pixel.
+    \item \textbf{Bilinear}: The intensity value of the nearest four
+          pixels is used to estimate the intensity value of the pixel.
+    \item \textbf{Bicubic}: The intensity value of the nearest sixteen
+          pixels is used to estimate the intensity value of the pixel.
+\end{itemize}
+\subsection{Relationships Between Pixels}
+The following sections will define some common sets that are used to
+describe relationships between pixels in an image.
+\subsubsection{Neighbours of a Pixel}
+The \textbf{neighbours} of a pixel \(\symbf{p} = \left( x,\: y
+\right)\) are the pixels that are adjacent to \(\symbf{p}\).
+\begin{itemize}
+    \item The \textbf{4-neighbours} of \(\symbf{p}\) are defined as the
+          pixels that are adjacent to \(\symbf{p}\) in the
+          \textbf{cardinal} directions:
+          \begin{equation*}
+              \symbf{N}_4\left( \symbf{p} \right) = \left\{ \left( x,\: y-1 \right), \left( x-1,\: y \right), \left( x+1,\: y \right), \left( x,\: y+1 \right) \right\},
+          \end{equation*}
+    \item The \textbf{diagonal-neighbours} of \(\symbf{p}\) are defined
+          as the pixels that are adjacent to \(\symbf{p}\) in the
+          \textbf{diagonal} directions:
+          \begin{equation*}
+              \symbf{N}_D\left( \symbf{p} \right) = \left\{ \left( x-1,\: y-1 \right), \left( x+1,\: y-1 \right), \left( x-1,\: y+1 \right), \left( x+1,\: y+1 \right) \right\},
+          \end{equation*}
+    \item The \textbf{8-neighbours} of \(\symbf{p}\) are defined as the
+          pixels that are adjacent to \(\symbf{p}\) in both the
+          \textbf{cardinal} and \textbf{diagonal} directions:
+          \begin{equation*}
+              \symbf{N}_8\left( \symbf{p} \right) = \symbf{N}_4\left( \symbf{p} \right) \cup \symbf{N}_D\left( \symbf{p} \right).
+          \end{equation*}
+\end{itemize}
+\subsubsection{Adjacency and Connectivity}
+Two pixels \(\symbf{p}\) and \(\symbf{q}\) are \textbf{adjacent} if
+they are neighbours and their intensity values are similar or belong to
+the same set of values \(V\) based on a threshold. This can occur in
+one of three ways:
+\begin{itemize}
+    \item \textbf{4-Adjacency} when \(\symbf{q} \in \symbf{N}_4\left( \symbf{p} \right)\).
+    \item \textbf{8-Adjacency} when \(\symbf{q} \in \symbf{N}_8\left( \symbf{p} \right)\).
+    \item \textbf{M-Adjacency} when \(\symbf{q} \in \symbf{N}_4\left( \symbf{p} \right)\) \textbf{or} \(\symbf{q} \in \symbf{N}_D\left( \symbf{p} \right)\) \textbf{and} \(\symbf{N}_4\left( \symbf{p} \right) \cap \symbf{N}_4\left( \symbf{q} \right) = \emptyset\).
+          This statement avoids double-counting an adjacency when
+          \(\symbf{q}\) is a diagonal neighbour of \(\symbf{p}\) while
+          another cardinal neighbour exists between \(\symbf{p}\) and
+          \(\symbf{q}\). Consider the binary example with \(\symbf{p},\symbf{q},\symbf{r} \in V = \left\{ 1 \right\}\):
+          \begin{equation*}
+              \begin{bmatrix}
+                  0 & \symbf{r} & \symbf{q} \\
+                  0 & \symbf{p} & 0         \\
+                  0 & 0         & 0
+              \end{bmatrix}
+              .
+          \end{equation*}
+          Here we do not consider \(\symbf{p}\) and \(\symbf{q}\) to be
+          M-adjacent, as \(\symbf{p}\) and \(\symbf{q}\) are already
+          adjacent through \(\symbf{r}\).
+\end{itemize}
+A \textbf{path} (or curve) between two pixels \(\symbf{p}\) and
+\(\symbf{q}\) is a sequence of \(n+1\) pixels \(\left( \symbf{p}_0, \symbf{p}_1,
+\ldots, \symbf{p}_n \right)\) such that \(\symbf{p}_0 = \symbf{p}\) and
+\(\symbf{p}_n = \symbf{q}\), where \(\symbf{p}_i\) is adjacent to
+\(\symbf{p}_{i+1}\) for \(i = 0, 1, 2, \ldots, n-1\). This path is said
+to have length \(n\), and is \textit{closed} if \(\symbf{p}_0 = \symbf{p}_n\).
+\subsubsection{Connectivity}
+Consider a subset of pixels in an image \(S\) with \(\symbf{p},
+\symbf{q} \in S\).
+\begin{itemize}
+    \item \(\symbf{p}\) and \(\symbf{q}\) are \textbf{connected} if
+          there exists a path between \(\symbf{p}\) and \(\symbf{q}\) such
+          that all pixels in the path are in \(S\).
+    \item The set of pixels connected to \(\symbf{p}\) in \(S\) form a
+          \textbf{connected component}.
+    \item If \(S\) only consists of \textit{one} connected component,
+          then \(S\) is said to be a \textbf{connected set} and is
+          called a \textbf{region} \(R\).
+\end{itemize}
+Two regions \(R_1\) and \(R_2\) are adjacent if their union forms a
+connected set, i.e., another region. Regions that are not adjacent are
+said to be \textbf{disjoint}.
+\subsection{Distance Metrics}
+The \textbf{distance} between two pixels \(\symbf{p}\) and
+\(\symbf{q}\) can be measured using a variety of metrics. The most
+common metrics are:
+\begin{itemize}
+    \item \textbf{Euclidean distance}:
+          \begin{equation*}
+              d\left( \symbf{p},\: \symbf{q} \right) = \sqrt{\left( x_p - x_q \right)^2 + \left( y_p - y_q \right)^2}.
+          \end{equation*}
+    \item \textbf{Manhattan (D4) distance} (or city-block distance):
+          \begin{equation*}
+              d_4\left( \symbf{p},\: \symbf{q} \right) = \abs{x_p - x_q} + \abs{y_p - y_q}.
+          \end{equation*}
+    \item \textbf{Chessboard (D8) distance} (or maximum distance):
+          \begin{equation*}
+              d_8\left( \symbf{p},\: \symbf{q} \right) = \max\left( \abs{x_p - x_q},\: \abs{y_p - y_q} \right).
+          \end{equation*}
+\end{itemize}
+In general, any metric \(d\) that satisfies the following properties is a
+\textbf{distance metric}:
+\begin{itemize}
+    \item The distance from a point to itself is zero:
+          \begin{equation*}
+              d\left( \symbf{p},\: \symbf{p} \right) = 0.
+          \end{equation*}
+    \item \textbf{Positivity}: The distance between two distinct points is always positive:
+          \begin{equation*}
+              d\left( \symbf{p},\: \symbf{q} \right) > 0 : \symbf{p} \neq \symbf{q}.
+          \end{equation*}
+    \item \textbf{Symmetry}: The distance between two points is always the same regardless of ordering:
+          \begin{equation*}
+              d\left( \symbf{p},\: \symbf{q} \right) = d\left( \symbf{q},\: \symbf{p} \right).
+          \end{equation*}
+    \item The Triangle Inequality is satisfied:
+          \begin{equation*}
+              d\left( \symbf{p},\: \symbf{q} \right) \leq d\left( \symbf{p},\: \symbf{r} \right) + d\left( \symbf{r},\: \symbf{q} \right).
+          \end{equation*}
+\end{itemize}
+for all \(\symbf{p},\: \symbf{q},\: \symbf{r}\) in this metric space.
+\subsection{Mathematical Operations}
+\subsubsection{Element-wise Operations}
+Given two images \(\symbf{X}\) and \(\symbf{Y}\) of equal dimensions,
+an element-wise operation is an operation that is applied to each pixel
+in the image. Suppose we wish to apply the binary operation \(\otimes\)
+on \(\symbf{X}\) and \(\symbf{Y}\). The resulting image \(\symbf{Z}\)
+is given by
+\begin{equation*}
+    \symbf{Z} = \symbf{X} \otimes \symbf{Y} =
+    \begin{bmatrix}
+        x_{00} \otimes y_{00}       & x_{01} \otimes y_{01}       & \cdots & x_{0,N-1} \otimes y_{0,N-1}     \\
+        x_{10} \otimes y_{10}       & x_{11} \otimes y_{11}       & \cdots & x_{1,N-1} \otimes y_{1,N-1}     \\
+        \vdots                      & \vdots                      & \ddots & \vdots                          \\
+        x_{M-1,0} \otimes y_{M-1,0} & x_{M-1,1} \otimes y_{M-1,1} & \cdots & x_{M-1,N-1} \otimes y_{M-1,N-1}
+    \end{bmatrix}
+\end{equation*}
+Here the operator \(\otimes\) can represent any binary operation, such
+as addition, subtraction, multiplication, or division.
+\subsubsection{Linear Operations}
+The operator \(H\) is a linear operation if it satisfies the following
+property:
+\begin{equation*}
+    H\left[ a\symbf{X} + b\symbf{Y} \right] = aH\left[ \symbf{X} \right] + bH\left[ \symbf{Y} \right],
+\end{equation*}
+for images \(\symbf{X}\) and \(\symbf{Y}\), where \(a\) and \(b\) are constants.
+\subsubsection{Spatial Operations}
+The operator \(T\) is a spatial operation if the output pixel value is
+determined by the values of pixels in the neighbourhood of any input
+pixel. \(T\) can be categorised as one of three types of spatial
+operations:
+\begin{itemize}
+    \item \textbf{Pointwise}: The output pixel value is
+          determined by the value of the input pixel only.
+    \item \textbf{Neighbourhood}: The output pixel value is
+          determined by the value of the input pixel and any
+          neighbouring pixels.
+    \item \textbf{Global}: The output pixel value is
+          determined by the value of pixels in the entire image.
+    \item \textbf{Geometric}: The output pixel value is
+          determined by the spatial location of the pixel.
+\end{itemize}
+\section{Intensity Transformations \& Spatial Filters}
+\subsection{Intensity Transformations}
+An intensity transform aims to modify the contrast of an image by
+changing the range of intensity values in that image. The following
+sections will define some common intensity transformations. In the
+following sections let \(r\) be the input intensity and \(s\) be the
+output intensity of an image.
+\subsubsection{Identity Transformation}
+The identity transformation is the simplest intensity transformation
+which does not alter an image. It is defined as
+\begin{equation*}
+    s = T\left( r \right) = r.
+\end{equation*}
+\subsubsection{Negative Transformation}
+The image negation transformation is used to invert the intensity
+values of an image. It is defined as
+\begin{equation*}
+    s = T\left( r \right) = \left( L - 1 \right) - r,
+\end{equation*}
+where \(L\) is the number of intensity levels in the image.
+\subsubsection{Logarithmic Transformation}
+The logarithmic transformation is used to enhance darker regions of an
+image by compressing brighter regions. It is defined as
+\begin{equation*}
+    s = T\left( r \right) = c \log{\left( 1 + r \right)},
+\end{equation*}
+where \(c\) is a constant that scales the intensity values of the image.
+\subsubsection{Power-Law (Gamma) Transformation}
+The power-law transformation is used to correct the gamma of an image,
+either by enhancing or reducing dark or bright regions. It can be
+thought of as a generalisation of the logarithmic transformation. It is
+defined as
+\begin{equation*}
+    s = T\left( r \right) = c r^\gamma,
+\end{equation*}
+where \(c\) is a constant that scales the intensity values of the image
+and \(\gamma\) is the gamma value.
+\begin{itemize}
+    \item When \(\gamma < 1\), the transformation enhances the darker
+          regions of the image, while compressing the brighter regions.
+    \item When \(\gamma > 1\), the transformation enhances the brighter
+          regions of the image, while compressing the darker regions.
+\end{itemize}
+\subsubsection{Piecewise-Linear Transformation}
+Piecewise-linear transformations are used to enhance the contrast of
+specific regions of an image. Some common piecewise-linear
+transformations include:
+\begin{itemize}
+    \item \textbf{Contrast Stretching}: Enhances the contrast of an
+          image by stretching the intensity values to the full range of
+          intensity levels.
+    \item \textbf{Intensity Level Slicing}: Enhances the contrast of
+          specific regions of an image by setting the intensity values
+          of other regions to zero or by leaving them unchanged.
+    \item \textbf{Bit-Plane Slicing}: Highlights the contribution made
+          to image appearance by specific bits in the image.
+\end{itemize}
+\subsection{Histogram Processing}
+Histograms are used to visualise the distribution of intensity values
+in an image. Given an image \(\symbf{X} \in \interval{0}{L-1}^{M \times
+N}\), the histogram \(h_{\symbf{X}}\left( k \right)\) is defined as
+\begin{equation*}
+    h_{\symbf{X}}\left( k \right) = n_k,
+\end{equation*}
+where \(n_k\) is the number of pixels in the image with intensity value
+\(k\). If we normalise these values, we find the probability of
+obtaining a pixel with intensity value \(k\):
+\begin{equation*}
+    p_{\symbf{X}}\left( k \right) = \frac{n_k}{MN}.
+\end{equation*}
+It follows that
+\begin{equation*}
+    \sum_{k=0}^{L-1} p_{\symbf{X}}\left( k \right) = 1.
+\end{equation*}
+\subsubsection{Histogram Equalisation}
+Histogram equalisation is a method used to spread the most frequent
+intensity values in an image to the full range of intensity levels,
+thereby achieving a more uniform distribution of intensity values. To
+do this, we will use the following transformation that maps the
+cumulative distribution function of an input image \(\symbf{X}\) to the
+cumulative distribution function of a uniform distribution:
+\begin{equation*}
+    s = T\left( r \right) = \left( L - 1 \right) \sum_{j=0}^{r} p_{\symbf{X}}\left( j \right) = \frac{L - 1}{MN} \sum_{j=0}^{r} n_j.
+\end{equation*}
+\subsubsection{Histogram Matching}
+In some cases, we wish to match the histogram of \(\symbf{X}\) to the
+histogram of another image \(\symbf{Y}\). To do so, consider the
+histogram equalisation of \(\symbf{Y}\) with intensity values \(z\):
+\begin{equation*}
+    s = G\left( z \right) = \left( L - 1 \right) \sum_{j=0}^{z} p_{\symbf{Y}}\left( j \right) = \frac{L - 1}{MN} \sum_{j=0}^{z} n_j.
+\end{equation*}
+Thus we have the mapping:
+\begin{equation*}
+    T: r \mapsto s \quad \text{and} \quad G: z \mapsto s.
+\end{equation*}
+As both \(T\) and \(G\) map to the same equalised space, we can define
+the transformation \(z = H\left( r \right)\) that maps the histogram of
+\(\symbf{X}\) to the histogram of \(\symbf{Y}\) as
+\begin{equation*}
+    z = H\left( r \right) = G^{-1}\left( T\left( r \right) \right) = G^{-1}\left( s \right).
+\end{equation*}
+\subsection{Spatial Filtering}
+Spatial filtering is the process of creating a new image by applying a
+mask (or kernel, template or window) to each pixel in an image. This
+new pixel value is determined by the intensity values of the pixels in
+the neighbourhood of the original pixel. The mask is defined as a \(m
+\times n\) matrix \(\symbf{W}\) with elements \(w_{ij}\) that represent
+the weights of the pixels in the neighbourhood of the pixel being
+processed. For convenience, \(m\) and \(n\) are typically odd integers.
+
+The output pixel value is given by the weighted sum of the intensity
+values of the pixels in the neighbourhood of the pixel. This can be
+done using one of two operations:
+\begin{itemize}
+    \item \textbf{Correlation}: The mask is shifted across the image
+          and the weighted sum is calculated at each position.
+    \item \textbf{Convolution}: The mask is first flipped horizontally
+          and vertically before it is shifted across the image.
+\end{itemize}
+\subsubsection{Correlation}
+The \(\left( i,\: j \right)\)th element of the correlation of an image
+\(\symbf{X}\) with a mask \(\symbf{W}\) is defined as
+\begin{equation*}
+    y_{ij} = \symbf{W} \star \symbf{X} = \sum_{s = -a}^a \sum_{t = -b}^b w_{st} x_{i+s, j+t}
+\end{equation*}
+for \(a = \frac{m-1}{2}\) and \(b = \frac{n-1}{2}\).
+\subsubsection{Convolution}
+The \(\left( i,\: j \right)\)th element of the convolution of an image
+\(\symbf{X}\) with a mask \(\symbf{W}\) is defined as
+\begin{equation*}
+    y_{ij} = \symbf{W} \ast \symbf{X} = \sum_{s = -a}^a \sum_{t = -b}^b w_{st} x_{i-s, j-t}
+\end{equation*}
+for \(a = \frac{m-1}{2}\) and \(b = \frac{n-1}{2}\).
+\subsubsection{Padding}
+For masks larger than \(1 \times 1\), the indices \(w_{st}\) will
+exceed the bounds of the image \(\symbf{X}\). To prevent this, the
+image is often padded with an additional border of pixels. Common
+padding methods include:
+\begin{itemize}
+    \item \textbf{Zero Padding}: The border is padded with zeros.
+    \item \textbf{Boundary Replication Padding}: The border is padded with the
+          intensity values of the nearest pixel.
+    \item \textbf{Reflection Padding}: The border is padded with the
+          intensity values of reflected pixels (one pixel away from the
+          border).
+\end{itemize}
+\subsubsection{Averaging Filters}
+Averaging filters are used to reduce noise in an image by averaging the
+intensity values of the pixels in the neighbourhood of the pixel being
+processed. An averaging filter considers a continuous function of two
+variables, such as the multivariable Gaussian function:
+\begin{equation*}
+    w_{st} = \frac{1}{2\pi\sigma^2} \exp{\left( -\frac{s^2 + t^2}{2\sigma^2} \right)}.
+\end{equation*}
+\subsubsection{Smoothing Linear Filters}
+Smoothing filters are used to reduce noise in an image by averaging the
+intensity values of the pixels in the neighbourhood of the pixel being
+processed. A general implementation for filtering an \(M \times N\)
+image with a \textbf{weighted averaging filter} of size \(m \times n\)
+is defined as:
+\begin{equation*}
+    y_{ij} = \frac{\sum_{s = -a}^a \sum_{t = -b}^b w_{st} x_{i+s,j+t}}{\sum_{s = -a}^a \sum_{t = -b}^b w_{st}},
+\end{equation*}
+\subsubsection{Order-Statistic Non-Linear Filters}
+Order-statistic filters are used to reduce noise in an image by
+replacing the intensity value of a pixel with the median, maximum, or
+minimum intensity value of the pixels in the neighbourhood of the pixel
+being processed. Median filters have good noise-reduction capabilities
+with less smoothing and are used to remove impulse or salt-and-pepper
+noise.
+\subsubsection{Sharpening Filters}
+Sharpening filters are used to enhance edges and discontinuities in an
+image. One technique is to consider the Laplacian of the image
+\(f\left( x,\: y \right)\):
+\begin{equation*}
+    \nabla^2 f = \pdv[order=2]{f}{x} + \pdv[order=2]{f}{y}.
+\end{equation*}
+For discrete images, we will use the first-order forward difference
+approximation:
+\begin{align*}
+    \pdv{f}{x} & = f\left( x + 1,\: y \right) - f\left( x,\: y \right)  \\
+    \pdv{f}{y} & = f\left( x,\: y + 1 \right) - f\left( x,\: y \right),
+\end{align*}
+and the second-order central difference approximation:
+\begin{align*}
+    \pdv[order=2]{f}{x} & = f\left( x + 1,\: y \right) - 2f\left( x,\: y \right) + f\left( x - 1,\: y \right)  \\
+    \pdv[order=2]{f}{y} & = f\left( x,\: y + 1 \right) - 2f\left( x,\: y \right) + f\left( x,\: y - 1 \right).
+\end{align*}
+The Laplacian allows us to identify transitions in intensity values
+across an image by creating a filter with one of the following masks:
+\begin{equation*}
+    \symbf{W} =
+    \begin{bmatrix}
+        0 & 1  & 0 \\
+        1 & -4 & 1 \\
+        0 & 1  & 0
+    \end{bmatrix}
+    \quad \text{or} \quad \symbf{W} =
+    \begin{bmatrix}
+        0  & -1 & 0  \\
+        -1 & 4  & -1 \\
+        0  & -1 & 0
+    \end{bmatrix}
+    ,
+\end{equation*}
+where the first mask will sharpen the image, while the second mask will
+sharpen the negative of the image. In general, we can sharpen edges by
+adding the Laplacian to the original image:
+\begin{equation*}
+    g\left( x,\: y \right) = f\left( x,\: y \right) + c \nabla^2 f\left( x,\: y \right),
+\end{equation*}
+where \(c = -1\) will sharpen the image, while \(c = 1\) sharpen the
+negative of the image.
+\subsubsection{Unsharp Masking and High-Boost Filtering}
+Unsharp masking is a sharpening technique that enhances edges and
+discontinuities in an image by subtracting a blurred version of the
+image from the original image. The process takes the following steps:
+\begin{enumerate}
+    \item Blur the original image \(f\left( x,\: y \right)\).
+    \item Subtract the blurred image from the original image to obtain the mask
+    \begin{equation*}
+        g_{\text{mask}}\left( x,\: y \right) = f\left( x,\: y \right) - \bar{f}\left( x,\: y \right),
+    \end{equation*}
+    where \(\bar{f}\left( x,\: y \right)\) is the blurred image.
+    \item Add the mask to the original image to obtain a sharpened image:
+    \begin{equation*}
+        g\left( x,\: y \right) = f\left( x,\: y \right) + k g_{\text{mask}}\left( x,\: y \right), \quad k > 0.
+    \end{equation*}
+    where
+    \begin{itemize}
+        \item \(k = 1\) corresponds to unsharp masking.
+        \item \(k > 1\) corresponds to high-boost filtering.
+    \end{itemize}
+\end{enumerate}
+\end{document}
