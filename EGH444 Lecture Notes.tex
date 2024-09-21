@@ -642,4 +642,202 @@ image from the original image. The process takes the following steps:
         \item \(k > 1\) corresponds to high-boost filtering.
     \end{itemize}
 \end{enumerate}
+\section{Filtering in the Frequency Domain}
+\subsection{2D Fourier Transform}
+The 2D Fourier transform of an image \(f\left( x,\: y \right)\)\footnote{\(f\) must satisfy the Dirichlet conditions for the 2D Fourier transform to exist.}
+is defined as
+\begin{equation*}
+    F\left( u,\: v \right) = \mathscr{F}\left\{ f\left( x,\: y \right) \right\} = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f\left( x,\: y \right) e^{-j2\pi\left( ux + vy \right)} \odif{x} \odif{y},
+\end{equation*}
+with the inverse 2D Fourier transform defined as:
+\begin{equation*}
+    f\left( x,\: y \right) = \mathscr{F}^{-1}\left\{ F\left( u,\: v \right) \right\} = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} F\left( u,\: v \right) e^{j2\pi\left( ux + vy \right)} \odif{u} \odif{v}.
+\end{equation*}
+When \(f\) is a discrete \(M \times N\) image, the 2D discrete Fourier
+transform is defined as
+\begin{equation*}
+    F\left( u,\: v \right) = \sum_{x = 0}^{M-1} \sum_{y = 0}^{N-1} f\left( x,\: y \right) e^{-j2\pi\left( ux/M + vy/N \right)},
+\end{equation*}
+with the inverse 2D discrete Fourier transform defined as
+\begin{equation*}
+    f\left( x,\: y \right) = \sum_{u = 0}^{M-1} \sum_{v = 0}^{N-1} F\left( u,\: v \right) e^{j2\pi\left( ux/M + vy/N \right)}.
+\end{equation*}
+Many properties of the Fourier transform in the 1D case extend to the 2D
+case, such as linearity, symmetry, and shift properties. Notably, the
+sampling theorem in 2D states that an image can be perfectly
+reconstructed from its samples if the sampling rate \(f_s\) is greater
+than twice the highest frequency component in the image:
+\begin{equation*}
+    f_s > 2f_{\text{max}}.
+\end{equation*}
+In 2D, this is equivalent to:
+\begin{equation*}
+    \frac{1}{\adif{x}} > 2 u_{\text{max}} \quad \text{and} \quad \frac{1}{\adif{y}} > 2 v_{\text{max}},
+\end{equation*}
+where \(u_{\text{max}}\) and \(v_{\text{max}}\) are the maximum
+frequencies in the \(x\) and \(y\) directions, respectively. The
+frequency of spatial and frequency samples can also be related by the
+following equations:
+\begin{equation*}
+    \adif{u} = \frac{1}{M\adif{x}} \quad \text{and} \quad \adif{v} = \frac{1}{N\adif{y}}.
+\end{equation*}
+\subsection{Filtering in the Frequency Domain}
+Filtering can also be performed in the frequency domain if the image
+contains noise that is more easily removed when visualising the
+magnitude and phase spectra of the image. In general, a filter in the
+frequency domain is defined as
+\begin{equation*}
+    g\left( x,\: y \right) = \mathscr{F}^{-1}\left\{ H\left( u,\: v \right) F\left( u,\: v \right) \right\},
+\end{equation*}
+where \(H\left( u,\: v \right)\) is a filter designed to act on the
+frequency spectrum of the image. Due to the lack of padding, the
+horizontal or vertical edges of the resulting image may contain black
+pixels, leading to inconsistent filtering. To avoid this, we can take
+the following steps:
+\begin{enumerate}
+    \item For an image \(f\left( x,\: y \right)\) of size \(M \times N\), define padding parameters
+          \(P = 2M\) and \(Q = 2N\).
+    \item Form a padded image \(f_p\left( x,\: y \right)\) of size \(P \times Q\)
+          by appending the necessary number of zeros to \(f\).\
+    \item Multiply the padded image by \(\left( -1 \right)^{x + y}\) to centre the
+          transform at the origin.
+    \item Compute the 2D Fourier transform of the transformed padded image.
+    \item Multiply the result by the symmetric filter \(H\left( u,\: v \right)\) of size \(P \times Q\) to form \(G\left( u,\: v \right)\).
+    \item Obtain the processed image \(g_p\left( x,\: y \right) = \Re\left\{ \mathscr{F}^{-1}\left\{ G\left( u,\: v \right) \right\} \right\} \left( -1 \right)^{x + y}\).
+    \item Obtain the final processed image \(g\left( x,\: y \right)\) by
+          cropping the processed image to the original size \(M \times N\),
+          which is in the top-left corner of the processed image.
+\end{enumerate}
+\subsection{Image Smoothing}
+\subsubsection{Ideal Low-Pass Filters}
+An ideal low-pass filter passes all frequencies within a circle of
+radius \(D_0\) from the origin and suppresses all frequencies outside
+of this circle, without attenuation:
+\begin{equation*}
+    H\left( u,\: v \right) =
+    \begin{cases}
+        1 & \text{if } D\left( u,\: v \right) \leq D_0, \\
+        0 & \text{if } D\left( u,\: v \right) > D_0,
+    \end{cases}
+\end{equation*}
+Here \(D\left( u,\: v \right)\) is the distance from the origin to the
+point \(\left( u,\: v \right)\) in the frequency domain:
+\begin{equation*}
+    D\left( u,\: v \right) = \sqrt{\left( u - P/2 \right)^2 + \left( v - Q/2 \right)^2}.
+\end{equation*}
+\subsubsection{Butterworth Low-Pass Filters}
+A Butterworth low-pass filter is defined as
+\begin{equation*}
+    H\left( u,\: v \right) = \frac{1}{1 + \left( D\left( u,\: v \right)/D_0 \right)^{2n}},
+\end{equation*}
+where \(n\) is the order of the filter. A higher-order filter has a
+sharper transition between the passband and the stopband, but also
+results in more rippling in the spatial domain.
+\subsubsection{Gaussian Low-Pass Filters}
+A Gaussian low-pass filter is defined as
+\begin{equation*}
+    H\left( u,\: v \right) = \exp{\left( -\frac{D^2\left( u,\: v \right)}{2D_0^2} \right)},
+\end{equation*}
+where \(D_0\) is the standard deviation of the Gaussian filter.
+\subsection{Image Sharpening}
+\subsubsection{Ideal High-Pass Filters}
+An ideal high-pass filter passes all frequencies outside a circle of
+radius \(D_0\) from the origin and suppresses all frequencies inside of
+this circle, without attenuation:
+\begin{equation*}
+    H\left( u,\: v \right) =
+    \begin{cases}
+        0 & \text{if } D\left( u,\: v \right) \leq D_0, \\
+        1 & \text{if } D\left( u,\: v \right) > D_0.
+    \end{cases}
+\end{equation*}
+High-pass equivalent filters can be generated for all of the above
+low-pass filters by taking the complement of the low-pass filter:
+\begin{equation*}
+    H_{\text{HP}}\left( u,\: v \right) = 1 - H_{\text{LP}}\left( u,\: v \right).
+\end{equation*}
+\subsubsection{Butterworth High-Pass Filters}
+A Butterworth high-pass filter is defined as
+\begin{equation*}
+    H\left( u,\: v \right) = \frac{1}{1 + \left( D_0/D\left( u,\: v \right) \right)^{2n}},
+\end{equation*}
+where \(n\) is the order of the filter.
+\subsubsection{Gaussian High-Pass Filters}
+A Gaussian high-pass filter is defined as
+\begin{equation*}
+    H\left( u,\: v \right) = 1 - \exp{\left( -\frac{D^2\left( u,\: v \right)}{2D_0^2} \right)},
+\end{equation*}
+where \(D_0\) is the standard deviation of the Gaussian filter.
+\subsubsection{Laplacian Filters}
+We can consider an alternative formulation for the Laplacian using a
+filter the frequency domain. In the frequency domain, the Laplacian
+becomes
+\begin{equation*}
+    \nabla^2 f = \pdv[order=2]{f}{x} + \pdv[order=2]{f}{y} = -4\pi^2 u^2 F\left( u,\: v \right) - 4\pi^2 v^2 F\left( u,\: v \right) = -4\pi^2 \left( u^2 + v^2 \right) F\left( u,\: v \right).
+\end{equation*}
+Let us then define the filter \(H\left( u,\: v \right)\) as
+\begin{equation*}
+    H\left( u,\: v \right) = -4 \pi^2 \left( u^2 + v^2 \right),
+\end{equation*}
+or, with respect to the center of the frequency rectangle,
+\begin{equation*}
+    H\left( u,\: v \right) = -4 \pi^2 \left( \left( u - P/2 \right)^2 + \left( v - Q/2 \right)^2 \right) = -4\pi D^2\left( u,\: v \right).
+\end{equation*}
+Then, the Laplacian of an image \(f\left( x,\: y \right)\) is given by
+\begin{equation*}
+    \nabla^2 f\left( x,\: y \right) = \mathscr{F}^{-1}\left\{ H\left( u,\: v \right) F\left( u,\: v \right) \right\}.
+\end{equation*}
+Then for the enhanced image
+\begin{equation*}
+    g\left( x,\: y \right) = f\left( x,\: y \right) + c \nabla^2 f\left( x,\: y \right),
+\end{equation*}
+\(c = -1\), so that in the frequency domain, this is equivalent to
+\begin{equation*}
+    G\left( u,\: v \right) = F\left( u,\: v \right) - H\left( u,\: v \right) F\left( u,\: v \right).
+\end{equation*}
+\subsection{Selective Filtering}
+Bandreject and bandpass filters can be used to selectively filter
+specific frequency bands in an image. A bandreject filter is defined as
+\begin{equation*}
+    H\left( u,\: v \right) =
+    \begin{cases}
+        0 & \text{if } D_0 - \frac{W}{2} \leq D\left( u,\: v \right) \leq D_0 + \frac{W}{2}, \\
+        1 & \text{otherwise},
+    \end{cases}
+\end{equation*}
+where \(D_0\) is the centre frequency and \(W\) is the width of the
+band. A bandpass filter is defined as the complement of the bandreject
+filter:
+\begin{equation*}
+    H_{\text{BP}}\left( u,\: v \right) = 1 - H_{\text{BR}}\left( u,\: v \right).
+\end{equation*}
+\subsubsection{Butterworth Bandreject Filters}
+A Butterworth bandreject filter is defined as
+\begin{equation*}
+    H\left( u,\: v \right) = \frac{1}{1 + \left( \frac{D\left( u,\: v \right)W}{D^2\left( u,\: v \right) - D_0^2} \right)^{2n}},
+\end{equation*}
+where \(n\) is the order of the filter.
+\subsubsection{Gaussian Bandreject Filters}
+A Gaussian bandreject filter is defined as
+\begin{equation*}
+    H\left( u,\: v \right) = 1 - \exp{\left( - \left( \frac{D^2\left( u,\: v \right) - D_0^2}{D\left( u,\: v \right)W} \right)^2 \right)},
+\end{equation*}
+where \(D_0\) is the centre frequency and \(W\) is the width of the band.
+\subsubsection{Notch Filters}
+Notch filters are used to remove frequencies in a predefined neighbourhood
+of the frequency rectangle (rather than being centred at the origin).
+Zero-phase-shift filters must be symmetric about the origin, so a notch
+filter transfer function with center frequencies \(\left( u_0,\: v_0 \right)\)
+must have a corresponding notch filter transfer function with center
+frequencies \(\left( -u_0,\: -v_0 \right)\). The transfer function of a
+notch filter is constructed by multiplying the transfer functions of two
+highpass filter transfer functions whose centers have been translated
+to the centers of the notches. The general form for a notch filter with
+\(Q\) notches is
+\begin{equation*}
+    H\left( u,\: v \right) = \prod_{k=1}^Q H_k\left( u,\: v \right) H_{-k}\left( u,\: v \right),
+\end{equation*}
+where \(H_k\left( u,\: v \right)\) and \(H_{-k}\left( u,\: v \right)\)
+are the transfer functions of the highpass filters centred at the
+\(k\)th notch and its negative, respectively.
 \end{document}
