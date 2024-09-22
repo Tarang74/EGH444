@@ -840,4 +840,239 @@ to the centers of the notches. The general form for a notch filter with
 where \(H_k\left( u,\: v \right)\) and \(H_{-k}\left( u,\: v \right)\)
 are the transfer functions of the highpass filters centred at the
 \(k\)th notch and its negative, respectively.
+\section{Colour}
+Colour is a perceptual property of light that is produced when white
+light is passed through a prism. The wavelengths of light that are
+produced comprise the \textbf{electromagnetic spectrum}, in which the
+human eye can discern wavelengths between \qtyrange[range-phrase={ and }]{400}{700}{nm}.
+\subsection{Colour Fundamentals}
+The human eye contains three types of cones that can be roughly
+classified as being sensitive to three principal sensing regions:
+\begin{itemize}
+    \item \textbf{Short-wavelength cones (S-cones)}: 2\% of cones that are sensitive to blue light (\qty{435.8}{nm}). These are also the most sensitive cones, despite only making up 2\% of the total.
+    \item \textbf{Medium-wavelength cones (M-cones)}: 33\% of cones that are sensitive to green light (\qty{546.1}{nm}).
+    \item \textbf{Long-wavelength cones (L-cones)}: 64\% of cones that are sensitive to red light (\qty{700}{nm}).
+\end{itemize}
+These \textbf{primary} colours can be combined to produce the
+\textbf{secondary} colours of light:
+\begin{itemize}
+    \item \textbf{Cyan}: A combination of blue and green light.
+    \item \textbf{Magenta}: A combination of blue and red light.
+    \item \textbf{Yellow}: A combination of green and red light.
+\end{itemize}
+Mixing the primary colours of light produces white light. The primary
+colours of \textbf{pigment} are the secondary colours of light, and
+mixing these produces black pigment. The primary colours are also
+referred to as the \textbf{additive primaries}, while the secondary
+colours are referred to as the \textbf{subtractive primaries}.
+\subsubsection{Characterising Colour}
+Colour can be characterised by three attributes:
+\begin{itemize}
+    \item \textbf{Brightness}: The intensity of the colour.
+    \item \textbf{Hue}: The dominant wavelength of light.
+    \item \textbf{Saturation}: The relative purity of the colour, or the amount of white light mixed with a hue.
+    Hence, the degree of saturation is inversely proportional to the amount of white light mixed with a hue.
+\end{itemize}
+Hue and saturation can also be combined to form the \textbf{chromaticity}
+of a colour.
+\subsection{Colour Models}
+Colour models, or color spaces, are coordinate system for representing
+colours mathematically. Some common colour spaces include:
+\begin{itemize}
+    \item \textbf{RGB}: The most common colour space, which represents
+          colours as a combination of red, green, and blue intensities.
+          RGB is used in displays and cameras.
+    \item \textbf{CMY(K)}: A subtractive colour model that represents
+            colours as a combination of cyan, magenta, and yellow
+            intensities, with an optional black intensity.
+            CMYK is used in colour printing.
+    \item \textbf{HSI}: A cylindrical colour space that represents
+    the hue, saturation, and intensity of a colour. This is also known
+    as HSV (value) or HSL (lightness), where the intensity may be scaled
+    to a different range.
+\end{itemize}
+\subsubsection{RGB Colour Model}
+The RGB colour model can be represented as a unit cube, with a corner at
+the origin, with the primary colours of red, green, and blue at the
+vertices:
+\begin{itemize}
+    \item \(\left( 1,\: 0,\: 0 \right)\): Red.
+    \item \(\left( 0,\: 1,\: 0 \right)\): Green.
+    \item \(\left( 0,\: 0,\: 1 \right)\): Blue.
+\end{itemize}
+The colour black is at the origin, while the colour white is at the
+opposite corner. Grayscale colours lie along the diagonal of the cube
+which intersects these two points. Note that in this model, colour
+values are normalised to the range \(\interval{0}{1}\).
+\subsubsection{CMY(K) Colour Model}
+The CMY(K) colour model exists on the same cube as the RGB colour model,
+but with the primary colours of cyan, magenta, and yellow at the
+vertices:
+\begin{itemize}
+    \item \(\left( 0,\: 1,\: 1 \right)\): Cyan.
+    \item \(\left( 1,\: 0,\: 1 \right)\): Magenta.
+    \item \(\left( 1,\: 1,\: 0 \right)\): Yellow.
+\end{itemize}
+Mathematically, CMYK colours are the complement of RGB colours:
+\begin{equation*}
+    \begin{bmatrix}
+        C \\
+        M \\
+        Y
+    \end{bmatrix} = \begin{bmatrix}
+        1 \\
+        1 \\
+        1
+    \end{bmatrix} - \begin{bmatrix}
+        R \\
+        G \\
+        B
+    \end{bmatrix}.
+\end{equation*}
+\subsubsection{HSI Colour Model}
+The HSI colour model is a cylindrical colour space that represents
+colours as a combination of hue, saturation, and intensity. The hue
+value is the angle around this cylinder, with red at \(0^{\circ}\), green at
+\(120^{\circ}\), and blue at \(240^{\circ}\). The intensity value is the
+distance along the intensity axis in the RGB cube, while the saturation
+value is the distance from the intensity axis.
+\begin{align}
+    \theta & = \arccos\left( \frac{2R - G - B}{2\sqrt{\left( R - G \right)^2 + \left( R - B \right)\left( G - B \right)}} \right), \\
+    H & = \begin{cases}
+        \frac{\theta}{360^{\circ}} & \text{if } B \leqslant G, \\
+        1 - \frac{\theta}{360^{\circ}} & \text{if } B > G,
+    \end{cases} \\
+    S & = 1 - \frac{3}{R + G + B} \min\left( R,\: G,\: B \right), \\
+    I & = \frac{R + G + B}{3}.
+\end{align}
+To convert from HSI to RGB, we can use the following equations. In the
+RG sector (\(0^{\circ} \leqslant H \leqslant 120^{\circ}\)):
+\begin{align*}
+    B & = I\left( 1 - S \right), \\
+    R & = I\left( 1 + \frac{S\cos H}{\cos\left( 60^{\circ} - H \right)} \right), \\
+    G & = 3I - \left( R + B \right).
+\end{align*}
+In the GB sector (\(120^{\circ} \leqslant H \leqslant 240^{\circ}\)):
+\begin{align*}
+    R & = I\left( 1 - S \right), \\
+    G & = I\left( 1 + \frac{S\cos\left( H - 120^{\circ} \right)}{\cos\left( 60^{\circ} - \left( H - 120^{\circ} \right) \right)} \right), \\
+    B & = 3I - \left( R + G \right).
+\end{align*}
+In the BR sector (\(240^{\circ} \leqslant H \leqslant 360^{\circ}\)):
+\begin{align*}
+    G & = I\left( 1 - S \right), \\
+    B & = I\left( 1 + \frac{S\cos\left( H - 240^{\circ} \right)}{\cos\left( 60^{\circ} - \left( H - 240^{\circ} \right) \right)} \right), \\
+    R & = 3I - \left( G + B \right).
+\end{align*}
+\subsection{Colour Image Acquisition}
+Colour images are acquired using monochromatic charge-coupled devices
+(CCDs) that are sensitive to red, green, and blue light. These devices
+are arranged in a Bayer filter mosaic, which consists of a \(2 \times 2\)
+grid of sensors with one red, one blue, and two green sensors.
+\begin{equation*}
+    \begin{bmatrix}
+        G & R \\
+        B & G
+    \end{bmatrix}
+\end{equation*}
+Here two green sensors are used to improve the resolution of the green
+channel, which is the most sensitive to the human eye. When demosaicking
+the image, the colour channels are extracted from the mosaic, and
+missing entries are interpolated using the values of neighbouring
+pixels in that channel.
+\begin{align*}
+    \begin{bmatrix}
+        G_{11} & R_{12} \\
+        B_{21} & G_{22}
+    \end{bmatrix}
+    \to
+    \begin{bmatrix}
+        - & R_{12} \\
+        - & -
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        G_{11} & - \\
+        - & G_{22}
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        - & - \\
+        B_{21} & -
+    \end{bmatrix}
+\end{align*}
+\subsubsection{Pixel Depth}
+The pixel depth of an image is the number of bits used to represent the
+colour of each pixel. The pixel depth determines the total number of
+colours that can be represented in an image. For an image with \(n\)
+bits per channel, the total number of colours is given by \(2^{3n}\).
+For example, an image with 8 bits per channel has a pixel depth of 24
+bits and can represent \(2^{24} = \num{16777216}\) unique colours.
+\subsection{Colour Image Processing}
+Colour images can be processed using the same techniques as grayscale
+images, but with the additional consideration of the colour channels.
+Transformations can either be applied to each channel independently or
+to individual channels, such as the hue, saturation, and intensity
+channels in the HSI colour space. We can define colour image
+transformations in the same way as for grayscale images:
+\begin{equation*}
+    g\left( x,\: y \right) = T\left( f\left( x,\: y \right) \right),
+\end{equation*}
+where \(f\left( x,\: y \right)\) is the input image, \(g\left( x,\: y \right)\)
+is the output image, and \(T\) is the transformation function.
+\subsubsection{Colour Intensity Transformations}
+Intensity transforms take the form:
+\begin{equation*}
+    g\left( x,\: y \right) = k f\left( x,\: y \right),
+\end{equation*}
+\begin{itemize}
+    \item RGB: \(s_i = k r_i\) for \(i = 1, 2, 3\).
+    \item HSI: \(s_1 = r_1\), \(s_2 = r_2\), and \(s_3 = k r_3\).
+    \item CMY: \(s_i = k r_i + \left( 1 - k \right)\) for \(i = 1, 2, 3\).
+\end{itemize}
+\subsubsection{Colour Complements}
+Colour complements are hues directly opposite each other on the colour
+circle. Complements are analogous to negative images in grayscale
+images and can be useful for enhancing detail in dark regions.
+\subsubsection{Colour Slicing}
+Colour slicing is a technique used to highlight specific colours in an
+image to separate objects from surroundings.
+\subsubsection{Colour Tonal Transformations}
+Colour tonal transformations are used to adjust the tonal range of an
+image. These transformations can be used to boost contrast in an image
+using power-law transformations.
+\subsubsection{Colour Balancing (White Balancing)}
+An image is colour imbalanced when a known white point in the image does
+not contain equal RGB or CMY components. Colour balancing is used to
+correct these imbalances by adjusting the channels to make such points
+truly white.
+\subsubsection{Colour Histogram Equalisation}
+Histogram equalisation can also be applied to the intensity channel of
+HSI images to improve the contrast of the image without altering the
+hue or saturation.
+\subsubsection{Colour Image Smoothing and Sharpening}
+Colour images can be smoothed or sharpened using the same techniques as
+grayscale images, by applying a filter to each channel independently.
+For example, an image can be smoothed by considering it's \(K\) average
+neighbours:
+\begin{equation*}
+    \symbf{y}_{ij} = \frac{1}{K} \sum_{\left( s,\: t \right) \in S} \symbf{x}_{st},
+\end{equation*}
+where \(S\) is the set of \(K\) neighbours of pixel \(\left( i,\: j \right)\).
+Similarly, an image can be sharpened by applying a Laplacian filter to
+each channel independently. The Laplacian of a colour image \(\symbf{x}\)
+is simply
+\begin{equation*}
+    \nabla^2 \symbf{x} = \begin{bmatrix}
+        \nabla^2 x_1 \\
+        \nabla^2 x_2 \\
+        \nabla^2 x_3
+    \end{bmatrix}
+\end{equation*}
+\subsubsection{Colour Image Segmentation}
+Colour image segmentation is the process of partitioning an image into
+regions based on colour. For HSI images, segmentation is performed on the
+hue channel, and the saturation channel is used to further isolate
+regions in the hue image. For RGB images, we can use distance metrics to
+measure if nearby pixels are similar to a desired colour \(\symbf{a}\).
 \end{document}
