@@ -627,25 +627,28 @@ discontinuities in an image by subtracting a blurred version of the
 image from the original image. The process takes the following steps:
 \begin{enumerate}
     \item Blur the original image \(f\left( x,\: y \right)\).
-    \item Subtract the blurred image from the original image to obtain the mask
-    \begin{equation*}
-        g_{\text{mask}}\left( x,\: y \right) = f\left( x,\: y \right) - \bar{f}\left( x,\: y \right),
-    \end{equation*}
-    where \(\bar{f}\left( x,\: y \right)\) is the blurred image.
-    \item Add the mask to the original image to obtain a sharpened image:
-    \begin{equation*}
-        g\left( x,\: y \right) = f\left( x,\: y \right) + k g_{\text{mask}}\left( x,\: y \right), \quad k > 0.
-    \end{equation*}
-    where
-    \begin{itemize}
-        \item \(k = 1\) corresponds to unsharp masking.
-        \item \(k > 1\) corresponds to high-boost filtering.
-    \end{itemize}
+    \item Subtract the blurred image from the original image to obtain
+          the mask
+          \begin{equation*}
+              g_{\text{mask}}\left( x,\: y \right) = f\left( x,\: y \right) - \bar{f}\left( x,\: y \right),
+          \end{equation*}
+          where \(\bar{f}\left( x,\: y \right)\) is the blurred image.
+    \item Add the mask to the original image to obtain a sharpened
+          image:
+          \begin{equation*}
+              g\left( x,\: y \right) = f\left( x,\: y \right) + k g_{\text{mask}}\left( x,\: y \right), \quad k > 0.
+          \end{equation*}
+          where
+          \begin{itemize}
+              \item \(k = 1\) corresponds to unsharp masking.
+              \item \(k > 1\) corresponds to high-boost filtering.
+          \end{itemize}
 \end{enumerate}
 \section{Filtering in the Frequency Domain}
 \subsection{2D Fourier Transform}
-The 2D Fourier transform of an image \(f\left( x,\: y \right)\)\footnote{\(f\) must satisfy the Dirichlet conditions for the 2D Fourier transform to exist.}
-is defined as
+The 2D Fourier transform of an image \(f\left( x,\: y
+\right)\)\footnote{\(f\) must satisfy the Dirichlet conditions for the
+2D Fourier transform to exist.} is defined as
 \begin{equation*}
     F\left( u,\: v \right) = \mathscr{F}\left\{ f\left( x,\: y \right) \right\} = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f\left( x,\: y \right) e^{-j2\pi\left( ux + vy \right)} \odif{x} \odif{y},
 \end{equation*}
@@ -695,18 +698,25 @@ horizontal or vertical edges of the resulting image may contain black
 pixels, leading to inconsistent filtering. To avoid this, we can take
 the following steps:
 \begin{enumerate}
-    \item For an image \(f\left( x,\: y \right)\) of size \(M \times N\), define padding parameters
-          \(P = 2M\) and \(Q = 2N\).
-    \item Form a padded image \(f_p\left( x,\: y \right)\) of size \(P \times Q\)
-          by appending the necessary number of zeros to \(f\).\
-    \item Multiply the padded image by \(\left( -1 \right)^{x + y}\) to centre the
-          transform at the origin.
-    \item Compute the 2D Fourier transform of the transformed padded image.
-    \item Multiply the result by the symmetric filter \(H\left( u,\: v \right)\) of size \(P \times Q\) to form \(G\left( u,\: v \right)\).
-    \item Obtain the processed image \(g_p\left( x,\: y \right) = \Re\left\{ \mathscr{F}^{-1}\left\{ G\left( u,\: v \right) \right\} \right\} \left( -1 \right)^{x + y}\).
-    \item Obtain the final processed image \(g\left( x,\: y \right)\) by
-          cropping the processed image to the original size \(M \times N\),
-          which is in the top-left corner of the processed image.
+    \item For an image \(f\left( x,\: y \right)\) of size \(M \times
+          N\), define padding parameters \(P = 2M\) and \(Q = 2N\).
+    \item Form a padded image \(f_p\left( x,\: y \right)\) of size \(P
+          \times Q\) by appending the necessary number of zeros to
+          \(f\).\
+    \item Multiply the padded image by \(\left( -1 \right)^{x + y}\) to
+          centre the transform at the origin.
+    \item Compute the 2D Fourier transform of the transformed padded
+          image.
+    \item Multiply the result by the symmetric filter \(H\left( u,\: v
+          \right)\) of size \(P \times Q\) to form \(G\left( u,\: v
+          \right)\).
+    \item Obtain the processed image \(g_p\left( x,\: y \right) =
+          \Re\left\{ \mathscr{F}^{-1}\left\{ G\left( u,\: v \right)
+          \right\} \right\} \left( -1 \right)^{x + y}\).
+    \item Obtain the final processed image \(g\left( x,\: y \right)\)
+          by cropping the processed image to the original size \(M
+          \times N\), which is in the top-left corner of the processed
+          image.
 \end{enumerate}
 \subsection{Image Smoothing}
 \subsubsection{Ideal Low-Pass Filters}
@@ -824,16 +834,16 @@ A Gaussian bandreject filter is defined as
 \end{equation*}
 where \(D_0\) is the centre frequency and \(W\) is the width of the band.
 \subsubsection{Notch Filters}
-Notch filters are used to remove frequencies in a predefined neighbourhood
-of the frequency rectangle (rather than being centred at the origin).
-Zero-phase-shift filters must be symmetric about the origin, so a notch
-filter transfer function with center frequencies \(\left( u_0,\: v_0 \right)\)
-must have a corresponding notch filter transfer function with center
-frequencies \(\left( -u_0,\: -v_0 \right)\). The transfer function of a
-notch filter is constructed by multiplying the transfer functions of two
-highpass filter transfer functions whose centers have been translated
-to the centers of the notches. The general form for a notch filter with
-\(Q\) notches is
+Notch filters are used to remove frequencies in a predefined
+neighbourhood of the frequency rectangle (rather than being centred at
+the origin). Zero-phase-shift filters must be symmetric about the
+origin, so a notch filter transfer function with center frequencies
+\(\left( u_0,\: v_0 \right)\) must have a corresponding notch filter
+transfer function with center frequencies \(\left( -u_0,\: -v_0
+\right)\). The transfer function of a notch filter is constructed by
+multiplying the transfer functions of two highpass filter transfer
+functions whose centers have been translated to the centers of the
+notches. The general form for a notch filter with \(Q\) notches is
 \begin{equation*}
     H\left( u,\: v \right) = \prod_{k=1}^Q H_k\left( u,\: v \right) H_{-k}\left( u,\: v \right),
 \end{equation*}
@@ -844,7 +854,8 @@ are the transfer functions of the highpass filters centred at the
 Colour is a perceptual property of light that is produced when white
 light is passed through a prism. The wavelengths of light that are
 produced comprise the \textbf{electromagnetic spectrum}, in which the
-human eye can discern wavelengths between \qtyrange[range-phrase={ and }]{400}{700}{nm}.
+human eye can discern wavelengths between \qtyrange[range-phrase={ and
+}]{400}{700}{nm}.
 \subsection{Colour Fundamentals}
 The human eye contains three types of cones that can be roughly
 classified as being sensitive to three principal sensing regions:
@@ -871,7 +882,7 @@ Colour can be characterised by three attributes:
     \item \textbf{Brightness}: The intensity of the colour.
     \item \textbf{Hue}: The dominant wavelength of light.
     \item \textbf{Saturation}: The relative purity of the colour, or the amount of white light mixed with a hue.
-    Hence, the degree of saturation is inversely proportional to the amount of white light mixed with a hue.
+          Hence, the degree of saturation is inversely proportional to the amount of white light mixed with a hue.
 \end{itemize}
 Hue and saturation can also be combined to form the \textbf{chromaticity}
 of a colour.
@@ -883,17 +894,17 @@ colours mathematically. Some common colour spaces include:
           colours as a combination of red, green, and blue intensities.
           RGB is used in displays and cameras.
     \item \textbf{CMY(K)}: A subtractive colour model that represents
-            colours as a combination of cyan, magenta, and yellow
-            intensities, with an optional black intensity.
-            CMYK is used in colour printing.
+          colours as a combination of cyan, magenta, and yellow
+          intensities, with an optional black intensity.
+          CMYK is used in colour printing.
     \item \textbf{HSI}: A cylindrical colour space that represents
-    the hue, saturation, and intensity of a colour. This is also known
-    as HSV (value) or HSL (lightness), where the intensity may be scaled
-    to a different range.
+          the hue, saturation, and intensity of a colour. This is also known
+          as HSV (value) or HSL (lightness), where the intensity may be scaled
+          to a different range.
 \end{itemize}
 \subsubsection{RGB Colour Model}
-The RGB colour model can be represented as a unit cube, with a corner at
-the origin, with the primary colours of red, green, and blue at the
+The RGB colour model can be represented as a unit cube, with a corner
+at the origin, with the primary colours of red, green, and blue at the
 vertices:
 \begin{itemize}
     \item \(\left( 1,\: 0,\: 0 \right)\): Red.
@@ -905,8 +916,8 @@ opposite corner. Grayscale colours lie along the diagonal of the cube
 which intersects these two points. Note that in this model, colour
 values are normalised to the range \(\interval{0}{1}\).
 \subsubsection{CMY(K) Colour Model}
-The CMY(K) colour model exists on the same cube as the RGB colour model,
-but with the primary colours of cyan, magenta, and yellow at the
+The CMY(K) colour model exists on the same cube as the RGB colour
+model, but with the primary colours of cyan, magenta, and yellow at the
 vertices:
 \begin{itemize}
     \item \(\left( 0,\: 1,\: 1 \right)\): Cyan.
@@ -919,56 +930,63 @@ Mathematically, CMYK colours are the complement of RGB colours:
         C \\
         M \\
         Y
-    \end{bmatrix} = \begin{bmatrix}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
         1 \\
         1 \\
         1
-    \end{bmatrix} - \begin{bmatrix}
+    \end{bmatrix}
+    -
+    \begin{bmatrix}
         R \\
         G \\
         B
-    \end{bmatrix}.
+    \end{bmatrix}
+    .
 \end{equation*}
 \subsubsection{HSI Colour Model}
 The HSI colour model is a cylindrical colour space that represents
 colours as a combination of hue, saturation, and intensity. The hue
-value is the angle around this cylinder, with red at \(0^{\circ}\), green at
-\(120^{\circ}\), and blue at \(240^{\circ}\). The intensity value is the
-distance along the intensity axis in the RGB cube, while the saturation
-value is the distance from the intensity axis.
+value is the angle around this cylinder, with red at \(0^{\circ}\),
+green at \(120^{\circ}\), and blue at \(240^{\circ}\). The intensity
+value is the distance along the intensity axis in the RGB cube, while
+the saturation value is the distance from the intensity axis.
 \begin{align}
     \theta & = \arccos\left( \frac{2R - G - B}{2\sqrt{\left( R - G \right)^2 + \left( R - B \right)\left( G - B \right)}} \right), \\
-    H & = \begin{cases}
-        \frac{\theta}{360^{\circ}} & \text{if } B \leqslant G, \\
+    H      & =
+    \begin{cases}
+        \frac{\theta}{360^{\circ}}     & \text{if } B \leqslant G, \\
         1 - \frac{\theta}{360^{\circ}} & \text{if } B > G,
-    \end{cases} \\
-    S & = 1 - \frac{3}{R + G + B} \min\left( R,\: G,\: B \right), \\
-    I & = \frac{R + G + B}{3}.
+    \end{cases}
+    \\
+    S      & = 1 - \frac{3}{R + G + B} \min\left( R,\: G,\: B \right),                                                             \\
+    I      & = \frac{R + G + B}{3}.
 \end{align}
 To convert from HSI to RGB, we can use the following equations. In the
 RG sector (\(0^{\circ} \leqslant H \leqslant 120^{\circ}\)):
 \begin{align*}
-    B & = I\left( 1 - S \right), \\
+    B & = I\left( 1 - S \right),                                                 \\
     R & = I\left( 1 + \frac{S\cos H}{\cos\left( 60^{\circ} - H \right)} \right), \\
     G & = 3I - \left( R + B \right).
 \end{align*}
 In the GB sector (\(120^{\circ} \leqslant H \leqslant 240^{\circ}\)):
 \begin{align*}
-    R & = I\left( 1 - S \right), \\
+    R & = I\left( 1 - S \right),                                                                                                          \\
     G & = I\left( 1 + \frac{S\cos\left( H - 120^{\circ} \right)}{\cos\left( 60^{\circ} - \left( H - 120^{\circ} \right) \right)} \right), \\
     B & = 3I - \left( R + G \right).
 \end{align*}
 In the BR sector (\(240^{\circ} \leqslant H \leqslant 360^{\circ}\)):
 \begin{align*}
-    G & = I\left( 1 - S \right), \\
+    G & = I\left( 1 - S \right),                                                                                                          \\
     B & = I\left( 1 + \frac{S\cos\left( H - 240^{\circ} \right)}{\cos\left( 60^{\circ} - \left( H - 240^{\circ} \right) \right)} \right), \\
     R & = 3I - \left( G + B \right).
 \end{align*}
 \subsection{Colour Image Acquisition}
 Colour images are acquired using monochromatic charge-coupled devices
 (CCDs) that are sensitive to red, green, and blue light. These devices
-are arranged in a Bayer filter mosaic, which consists of a \(2 \times 2\)
-grid of sensors with one red, one blue, and two green sensors.
+are arranged in a Bayer filter mosaic, which consists of a \(2 \times
+2\) grid of sensors with one red, one blue, and two green sensors.
 \begin{equation*}
     \begin{bmatrix}
         G & R \\
@@ -992,12 +1010,12 @@ pixels in that channel.
     \end{bmatrix}
     +
     \begin{bmatrix}
-        G_{11} & - \\
-        - & G_{22}
+        G_{11} & -      \\
+        -      & G_{22}
     \end{bmatrix}
     +
     \begin{bmatrix}
-        - & - \\
+        -      & - \\
         B_{21} & -
     \end{bmatrix}
 \end{align*}
@@ -1028,7 +1046,8 @@ Intensity transforms take the form:
 \begin{itemize}
     \item RGB: \(s_i = k r_i\) for \(i = 1, 2, 3\).
     \item HSI: \(s_1 = r_1\), \(s_2 = r_2\), and \(s_3 = k r_3\).
-    \item CMY: \(s_i = k r_i + \left( 1 - k \right)\) for \(i = 1, 2, 3\).
+    \item CMY: \(s_i = k r_i + \left( 1 - k \right)\) for \(i = 1, 2,
+          3\).
 \end{itemize}
 \subsubsection{Colour Complements}
 Colour complements are hues directly opposite each other on the colour
@@ -1042,10 +1061,10 @@ Colour tonal transformations are used to adjust the tonal range of an
 image. These transformations can be used to boost contrast in an image
 using power-law transformations.
 \subsubsection{Colour Balancing (White Balancing)}
-An image is colour imbalanced when a known white point in the image does
-not contain equal RGB or CMY components. Colour balancing is used to
-correct these imbalances by adjusting the channels to make such points
-truly white.
+An image is colour imbalanced when a known white point in the image
+does not contain equal RGB or CMY components. Colour balancing is used
+to correct these imbalances by adjusting the channels to make such
+points truly white.
 \subsubsection{Colour Histogram Equalisation}
 Histogram equalisation can also be applied to the intensity channel of
 HSI images to improve the contrast of the image without altering the
@@ -1063,7 +1082,8 @@ Similarly, an image can be sharpened by applying a Laplacian filter to
 each channel independently. The Laplacian of a colour image \(\symbf{x}\)
 is simply
 \begin{equation*}
-    \nabla^2 \symbf{x} = \begin{bmatrix}
+    \nabla^2 \symbf{x} =
+    \begin{bmatrix}
         \nabla^2 x_1 \\
         \nabla^2 x_2 \\
         \nabla^2 x_3
@@ -1071,8 +1091,366 @@ is simply
 \end{equation*}
 \subsubsection{Colour Image Segmentation}
 Colour image segmentation is the process of partitioning an image into
-regions based on colour. For HSI images, segmentation is performed on the
-hue channel, and the saturation channel is used to further isolate
-regions in the hue image. For RGB images, we can use distance metrics to
-measure if nearby pixels are similar to a desired colour \(\symbf{a}\).
+regions based on colour. For HSI images, segmentation is performed on
+the hue channel, and the saturation channel is used to further isolate
+regions in the hue image. For RGB images, we can use distance metrics
+to measure if nearby pixels are similar to a desired colour
+\(\symbf{a}\).
+\section{Image Restoration}
+Image restoration aims to recover a degraded image using knowledge of
+the degradation process. Some techniques are best handled in the
+spatial domain, such as when removing additive noise, while others are
+more suited to the frequency domain, like when removing blurring. The
+process of image degradation and restoration can be modelled as a
+linear, position-invariant system:
+\begin{equation*}
+    g\left( x,\: y \right) = f\left( x,\: y \right) \ast h\left( x,\: y \right) + n\left( x,\: y \right) \iff G\left( u,\: v \right) = F\left( u,\: v \right) H\left( u,\: v \right) + N\left( u,\: v \right),
+\end{equation*}
+where \(f\left( x,\: y \right)\) is the original image, \(g\left( x,\:
+y \right)\) is the degraded and noisy image, \(h\left( x,\: y \right)\)
+is the degradation function, and \(n\left( x,\: y \right)\) is
+additive noise.
+\subsection{Noise Models}
+The principal source of noise in images is during the acquisition
+and/or transmission of the image. This includes the following factors
+that affect the performance of imaging sensors:
+\begin{itemize}
+    \item Environmental conditions during acquisition, such as light
+          levels and sensor temperature.
+    \item Quality of the sensing elements.
+\end{itemize}
+\subsubsection{Noise Probability Density Functions in the Spatial Domain}
+When modelling noise as a probability distribution, we will assume that
+noise is independent of spatial coordinates, except when considering
+spatially periodic noise, and that noise is uncorrelated with respect
+to the image content, that is there is no correlation between pixel
+values and the values of the noise components. Some common noise
+probability density functions are shown below:
+\begin{itemize}
+    \item \textbf{Uniform Noise}: A model that assumes noise is
+          uniformly distributed over a range of pixel intensities.
+          \begin{equation*}
+              p\left( z \right) =
+              \begin{cases}
+                  \displaystyle\frac{1}{b - a} & \text{if } a \leq z \leq b, \\
+                  0                            & \text{otherwise}.
+              \end{cases}
+          \end{equation*}
+          This model has a mean of \(\left( a + b \right)/2\) and a
+          variance of \(\left( b - a \right)^2/12\).
+    \item \textbf{Bipolar Impulse Noise}: (Salt-and-Pepper Noise) A
+          model adds noise to random pixel intensities.
+          \begin{equation*}
+              p\left( z \right) = p_0 \delta\left( z - z_0 \right) + p_1 \delta\left( z - z_1 \right),
+          \end{equation*}
+          where \(p_0\) and \(p_1\) are the probabilities of the noise
+          and \(z_0\) and \(z_1\) are the noise values. If \(p_0 = p_1\),
+          the noise is unipolar.
+    \item \textbf{Gaussian Noise}: A model that assumes noise is
+          normally distributed with a mean \(\mu\) and variance
+          \(\sigma^2\).
+          \begin{equation}
+              p\left( z \right) = \frac{1}{\sigma \sqrt{2\pi}} \exp\left( -\frac{\left( z - \mu \right)^2}{2\sigma^2} \right).
+          \end{equation}
+          where \(\mu\) is the mean, and \(\sigma^2\) is the variance.
+    \item \textbf{Rayleigh Noise}: A model that assumes noise is
+          Rayleigh distributed with a scale parameter \(\sigma\).
+          \begin{equation*}
+              p\left( z \right) =
+              \begin{cases}
+                  \displaystyle \frac{z - a}{\sigma^2} \exp\left( -\frac{\left( z - a \right)^2}{2\sigma^2} \right) & \text{if } z \geq a, \\
+                  0                                                                                                 & \text{otherwise}.
+              \end{cases}
+          \end{equation*}
+          where \(a > 0\) is the minimum value of the noise. This model
+          has a mean of \(a + \sigma \sqrt{\pi/2}\) and a variance of
+          \(\displaystyle \frac{4 - \pi}{2} \sigma^2\).
+    \item \textbf{Erlang Noise}: A model that assumes noise is Erlang
+          distributed with a shape parameter \(k \in \N\) and a scale
+          parameter \(\lambda\).
+          \begin{equation*}
+              p\left( z \right) =
+              \begin{cases}
+                  \displaystyle \frac{\lambda^k z^{k-1}}{\left( k - 1 \right)!} e^{- \lambda z} & \text{if } z \geq 0, \\
+                  0                                                                             & \text{otherwise},
+              \end{cases}
+          \end{equation*}
+          This model has a mean of \(k/\lambda\) and a variance of
+          \(k/\lambda^2\).
+    \item \textbf{Exponential Noise}: A model that assumes noise is
+          exponentially distributed with a scale parameter \(\lambda\).
+          \begin{equation*}
+              p\left( z \right) =
+              \begin{cases}
+                  \lambda e^{-\lambda z} & \text{if } z \geq 0, \\
+                  0                      & \text{otherwise}.
+              \end{cases}
+          \end{equation*}
+          This model has a mean of \(1/\lambda\) and a variance of
+          \(1/\lambda^2\).
+\end{itemize}
+\subsubsection{Periodic Noise in the Frequency Domain}
+Periodic noise typically arises from electrical or electromechanical
+interference during image acquisition. This noise is characterised by
+periodic patterns in the frequency domain, which can be greatly reduced
+using frequency domain filtering techniques.
+\subsection{Filtering Noise in the Spatial Domain}
+When only additive noise is present, we can use spatial filtering
+techniques to remove noise from an image. Here the corrupted image has
+the form
+\begin{equation*}
+    g\left( x,\: y \right) = f\left( x,\: y \right) + \eta\left( x,\: y \right) \iff G\left( u,\: v \right) = F\left( u,\: v \right) + N\left( u,\: v \right).
+\end{equation*}
+Some common spatial filtering techniques are shown below:
+\begin{itemize}
+    \item \textbf{Mean Filters}:
+          \begin{itemize}
+              \item \textbf{Arithmetic Mean Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = \frac{1}{mn} \sum_{\left( s,\: t \right) \in S_{xy}} g\left( s,\: t \right),
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\).
+              \item \textbf{Geometric Mean Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = \left[ \prod_{\left( s,\: t \right) \in S_{xy}} g\left( s,\: t \right) \right]^{1/mn}.
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\).
+              \item \textbf{Harmonic Mean Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = mn \left( \sum_{\left( s,\: t \right) \in S_{xy}} \frac{1}{g\left( s,\: t \right)} \right)^{-1}.
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\). This filter works well for
+                    salt (Gaussian) noise, but poorly for pepper (impulse) noise.
+              \item \textbf{Contraharmonic Mean Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = \frac{\sum_{\left( s,\: t \right) \in S_{xy}} g\left( s,\: t \right)^{Q + 1}}{\sum_{\left( s,\: t \right) \in S_{xy}} g\left( s,\: t \right)^Q}.
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\). Here \(Q\) is the order of
+                    the filter. The filter eliminates pepper noise for \(Q > 0\)
+                    and salt noise for \(Q < 0\). When \(Q = 0\), the filter is
+                    equivalent to the arithmetic mean filter, and when \(Q = -1\),
+                    it is equivalent to the harmonic mean filter.
+          \end{itemize}
+    \item \textbf{Order-Statistic Filters}:
+          \begin{itemize}
+              \item \textbf{Median Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = \text{median}\left\{ g\left( s,\: t \right) : \left( s,\: t \right) \in S_{xy} \right\}.
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\). This filter is effective at
+                    removing bipolar and unipolar impulse noise.
+              \item \textbf{Max Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = \max\left\{ g\left( s,\: t \right) : \left( s,\: t \right) \in S_{xy} \right\}.
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\).
+              \item \textbf{Min Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = \min\left\{ g\left( s,\: t \right) : \left( s,\: t \right) \in S_{xy} \right\}.
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\).
+              \item \textbf{Midpoint Filter}:
+                    \begin{equation*}
+                        \hat{f}\left( x,\: y \right) = \frac{1}{2} \left( \max\left\{ g\left( s,\: t \right) : \left( s,\: t \right) \in S_{xy} \right\} + \min\left\{ g\left( s,\: t \right) : \left( s,\: t \right) \in S_{xy} \right\} \right).
+                    \end{equation*}
+                    for some neighbourhood \(S_{xy}\). This filter is effective at
+                    removing randomly distributed noise such as Gaussian or uniform
+                    noise.
+              \item \textbf{Alpha-Trimmed Mean Filter}:
+                    \begin{equation}
+                        \hat{f}\left( x,\: y \right) = \frac{1}{mn - d} \sum_{\left( s,\: t \right) \in S_{xy}} g_r\left( s,\: t \right),
+                    \end{equation}
+                    where \(g_r\) represents the image \(g\) in which the
+                    \(d/2\) lowest and \(d/2\) highest intensity values in
+                    the neighbourhood \(S_{xy}\) have been removed. This
+                    filter is effective when multiple types of noise are
+                    present in an image. When \(d = 0\), the filter is
+                    equivalent to the arithmetic mean filter and when
+                    \(d = mn - 1\), the filter is equivalent to the median
+                    filter.
+          \end{itemize}
+\end{itemize}
+\subsection{Filtering Noise in the Frequency Domain}
+When noise is present in the frequency domain, we can use the frequency
+filtering techniques discussed in the previous section to remove noise
+from an image. This includes using bandreject, bandpass, and notch
+filters to remove noise in specific frequency bands or in specific
+neighbourhoods of the frequency domain.
+\subsection{Degradation Function}
+When we also want to remove degradation from an image, we must first
+estimate the degradation function using one of the following methods:
+\begin{itemize}
+    \item \textbf{Observation}: The degradation is assumed to be linear
+          and position-invariant. By looking at a small region of the image
+          \(g_s\left( x,\: y \right)\) containing sample structures where
+          te signal content is strong (i.e., high contrast), we can process
+          this sub-image to find the best result \(\hat{f}_s\left( x,\: y \right)\).
+          This lets us estimate the degradation function as
+          \begin{equation*}
+              H_s\left( u,\: v \right) = \frac{G_s\left( u,\: v \right)}{\hat{F}_s\left( u,\: v \right)},
+          \end{equation*}
+          where we assume the effect of noise is negligible in this region.
+          This allows us to then deduce the degradation function for the
+          entire image.
+    \item \textbf{Experimentation}: When equipment similar to what was
+          used to acquire the image is available, we can find system settings
+          that reproduce the most similar degradation and obtain an impulse
+          response for the degradation function by imaging an impulse (point
+          of light).
+          \begin{equation*}
+              H\left( u,\: v \right) = \frac{G\left( u,\: v \right)}{A}.
+          \end{equation*}
+          where \(A\) is the strength of the impulse.
+    \item \textbf{Mathematical Modelling}: In some cases, we can model
+          the degradation function mathematically. For example, Hufnagel and
+          Stanley proposed the following model based on the physical
+          characteristics of atmospheric turbulence:
+          \begin{equation*}
+              H\left( u,\: v \right) = \exp\left( -k \left( u^2 + v^2 \right)^{5/6} \right),
+          \end{equation*}
+          where \(k\) is the turbulence constant. We can also derive models
+          based on the type of degradation present in the image, such as
+          motion blur.
+          \begin{align*}
+              g\left( x,\: y \right) & = \int_0^T f\left( x - x_0\left( t \right),\: y - y_0\left( t \right) \right) \odif{t}                           \\
+              G\left( u,\: v \right) & = F\left( u,\: v \right) \int_0^T e^{-j2\pi\left( ux_0\left( t \right) + vy_0\left( t \right) \right)} \odif{t}.
+          \end{align*}
+          where \(x_0\left( t \right)\) and \(y_0\left( t \right)\) are the
+          motion paths in the \(x\) and \(y\) directions, respectively.
+          The degradation function then becomes
+          \begin{equation*}
+              H\left( u,\: v \right) = \frac{G\left( u,\: v \right)}{F\left( u,\: v \right)} = \int_0^T e^{-j2\pi\left( ux_0\left( t \right) + vy_0\left( t \right) \right)} \odif{t}.
+          \end{equation*}
+\end{itemize}
+\subsection{Inverse Filtering}
+When restoring an image \(g\left( x,\: y \right)\) that has been
+degradated by some process \(h\left( x,\: y \right)\), we can obtain an
+estimate for the reconstructed image in the frequency domain using
+direct inverse filtering:
+\begin{equation*}
+    \hat{F}\left( u,\: v \right) = \frac{G\left( u,\: v \right)}{H\left( u,\: v \right)}.
+\end{equation*}
+If we include noise in the image \(g\left( x,\: y \right)\), then it
+complicates this result further:
+\begin{equation*}
+    \hat{F}\left( u,\: v \right) = \frac{F\left( u,\: v \right) H\left( u,\: v \right) + N\left( u,\: v \right)}{H\left( u,\: v \right)} = F\left( u,\: v \right) + \frac{N\left( u,\: v \right)}{H\left( u,\: v \right)}.
+\end{equation*}
+This result tells us that it is not possible to recover the original
+undegraded image exactly because the noise \(\eta\left( x,\: y \right)\)
+is not known. Additionally, when \(H\) is zero or has small values, it
+is possible for the noise to be amplified, leading to a poor estimate.
+One approach to mitigate this issue is to filter frequencies to values
+near the origin.
+\subsubsection{Minimum Mean Square Error Filtering}
+The minimum mean square error (Wiener) filter is a statistical approach
+to image restoration that minimises the mean square error between the
+estimated and original image. It incorporates both the degradation
+function and statistical characteristics of the noise in the
+restoration process by considering the image and noise as random
+variables. When using the Wiener filter, the following is assumed:
+\begin{itemize}
+    \item The noise and image are uncorrelated.
+    \item The noise or image have zero mean.
+    \item The intensity levels in the estimate are a linear function of
+          the levels in the degraded image.
+\end{itemize}
+Then, the mimimum of the error function \(e\) defined:
+\begin{equation*}
+    e^2 = \E\left[ \left( f - \hat{f} \right)^2 \right]
+\end{equation*}
+is given by
+\begin{equation*}
+    \hat{F}\left( u,\: v \right) = \left[ \frac{1}{H\left( u,\: v \right)} \frac{\abs*{H\left( u,\: v \right)}^2}{\abs*{H\left( u,\: v \right)}^2 + S_\eta\left( u,\: v \right) / S_f\left( u,\: v \right)} \right] G\left( u,\: v \right),
+\end{equation*}
+where \(S_\eta\left( u,\: v \right)\) and \(S_f\left( u,\: v \right)\)
+are the power spectra of the noise and undegraded image, respectively:
+\begin{equation*}
+    S_\eta\left( u,\: v \right) = \abs*{N\left( u,\: v \right)}^2, \qquad S_f\left( u,\: v \right) = \abs*{F\left( u,\: v \right)}^2.
+\end{equation*}
+When these spectrums are unknown or difficult to estimate, we can use
+the following approximation:
+\begin{equation*}
+    \hat{F}\left( u,\: v \right) = \left[ \frac{1}{H\left( u,\: v \right)} \frac{\abs*{H\left( u,\: v \right)}^2}{\abs*{H\left( u,\: v \right)}^2 + K} \right] G\left( u,\: v \right),
+\end{equation*}
+where \(K\) is a specified constant.
+\subsubsection{Geometric Mean Filter}
+The geometric mean filter is a generalisation of the Wiener filter that
+has the form:
+\begin{equation*}
+    \hat{F}\left( u,\: v \right) = \left[ \frac{H^\ast\left( u,\: v \right)}{\abs*{H\left( u,\: v \right)}^2} \right]^\alpha \left[ \frac{H^\ast\left( u,\: v \right)}{\abs*{H\left( u,\: v \right)}^2 + \beta S_\eta\left( u,\: v \right) / S_f\left( u,\: v \right)} \right]^{1 - \alpha} G\left( u,\: v \right),
+\end{equation*}
+where \(\alpha\) and \(\beta\) are positive real constants.
+\begin{itemize}
+    \item When \(\alpha = 1\), we recover the inverse filter.
+    \item When \(\alpha = 0\), we recover the parametric Wiener filter.
+          If \(\beta = 1\), we recover the standard Wiener filter.
+    \item When \(\alpha = 1/2\), we recover the geometric mean filter.
+    \item When \(\alpha = 1/2\) and \(\beta = 1\), we obtain the
+          spectrum equalisation filter.
+\end{itemize}
+\subsubsection{Constrained Least Squares Filtering}
+When the power spectra of the noise and undegraded image are unknown,
+we can use the approximations shown above to estimate the restored
+image, but a constant value for the ratio of the noise and image power
+spectra is not always suitable. Using the convolution definition of the
+degraded and noised image, we can form the following system of
+equations:
+\begin{equation*}
+    \symbf{g} = \symbf{H} \symbf{f} + \symbf{\eta},
+\end{equation*}
+where we suppose \(g\left( x,\: y \right)\) is of size \(M \times N\),
+so that \(\symbf{g}\), \(\symbf{f}\) and \(\symbf{\eta}\) have
+dimensions \(MN \times 1\), and \(\symbf{H}\) has dimensions
+\(MN \times MN\). Notice that this leads to an extremely large system
+of equations that is computationally expensive to solve. This is
+complicated further by the fact that \(\symbf{H}\) is highly sensitive
+to noise. Thus, we will consider the method of constrained least squares
+optimisation, where we minimise the criterion function \(C\):
+\begin{align*}
+    \text{minimise}   \quad & C = \sum_{x = 0}^{M - 1} \sum_{y = 0}^{N - 1} \left( \symbf{\nabla}^2 f\left( x,\: y \right) \right)^2 \\
+    \text{subject to} \quad & \norm*{\symbf{g} - \symbf{H} \symbf{f}}^2 = \norm*{\symbf{\eta}}^2.
+\end{align*}
+Here the optimality of restoration is based on a measure of smoothness
+which we use the Laplacian operator to measure. The frequency domain
+solution to this problem is given by the expression:
+\begin{equation*}
+    \hat{F}\left( u,\: v \right) = \left[ \frac{H^\ast\left( u,\: v \right)}{\abs*{H\left( u,\: v \right)}^2 + \gamma \abs*{P\left( u,\: v \right)}^2} \right] G\left( u,\: v \right),
+\end{equation*}
+where \(\gamma\) is a parameter that must be adjusted so that the above
+constraint is satisfied. \(P\left( u,\: v \right)\) is known as a
+Laplacian kernel, and is the Fourier transform of the function:
+\begin{equation*}
+    p\left( x,\: y \right) =
+    \begin{bmatrix}
+        0  & -1 & 0  \\
+        -1 & 4  & -1 \\
+        0  & -1 & 0  \\
+    \end{bmatrix}
+    .
+\end{equation*}
+Note that \(P\) and \(H\) must be of the same size. If \(H\) has
+dimensions \(M \times N\), then \(p\) must be embedded in the center of
+an \(M \times N\) array of zeros. In order to preserve the even symmetry
+of \(p\), \(M\) and \(N\) must both be even integers. To compute the
+parameter \(\gamma\) iteratively, we can use the following algorithm
+which aims to reduce the residual:
+\begin{equation*}
+    \norm*{\symbf{r}}^2 = \norm*{\symbf{\eta}}^2 \pm \alpha,
+\end{equation*}
+where \(\alpha\) is an accuracy factor. It can be shown that this is a
+monotonically increasing function of \(\gamma\), meaning we can use a
+simple binary search algorithm to find the optimal value of \(\gamma\):
+\begin{enumerate}
+    \item Specify an initial value of \(\gamma\).
+    \item Compute the residual \(\norm*{\symbf{r}}^2 = \norm*{\symbf{g}
+          - \symbf{H} \symbf{f}}^2\).
+          \begin{itemize}
+              \item If \(\norm*{\symbf{r}}^2 < \norm*{\symbf{\eta}}^2 -
+                    \alpha\), increase \(\gamma\) and repeat step 2.
+              \item If \(\norm*{\symbf{r}}^2 > \norm*{\symbf{\eta}}^2 +
+                    \alpha\), decrease \(\gamma\) and repeat step 2.
+              \item Otherwise, the optimal value of \(\gamma\) has been
+                    found.
+          \end{itemize}
+\end{enumerate}
 \end{document}
