@@ -1968,11 +1968,11 @@ Compression works by removing redundancy in data. For an image, this can
 be done by removing:
 \begin{itemize}
     \item \textbf{Coding Redundancy}: where an image contains more bits
-    than necessary to represent information. For example, using an 8-bit
-    image representation when only 4 intensity values are present in an
-    image.
+          than necessary to represent information. For example, using an 8-bit
+          image representation when only 4 intensity values are present in an
+          image.
     \item \textbf{Spatial Redundancy}: when many neighbouring pixels
-    have the same value.
+          have the same value.
 \end{itemize}
 There are two types of data compression:
 \begin{itemize}
@@ -1981,8 +1981,8 @@ There are two types of data compression:
           As such, lossless compression is reversible.
     \item \textbf{Lossy Compression}: This type of compression reduces
           the size of the data by removing redundant information. This
-            results in a loss of information, but is usually not
-            perceptible. Due to this, lossy compression is irreversible.
+          results in a loss of information, but is usually not
+          perceptible. Due to this, lossy compression is irreversible.
 \end{itemize}
 \subsection{Lossless Compression}
 \subsubsection{Run-Length Encoding}
@@ -1990,7 +1990,8 @@ Run-length encoding is a simple form of lossless data compression that
 compresses sequences of the same value. It represents runs of identical
 intensities as \textbf{run-length} pairs, where each pair specifies the
 start of a new intensity and the number of consecutive pixels that have
-that intensity. For example, given a sequence of black and white pixels,
+that intensity. For example, given a sequence of black and white
+pixels,
 \begin{equation*}
     \left[ w w w w b b b w w w \right] \to \left[ 4w 3b 3w \right].
 \end{equation*}
@@ -2016,10 +2017,11 @@ as follows:
     \item Sort the symbols by frequency.
     \item For the two least frequent symbols, create a new parent node
           with a frequency equal to the sum of the two symbols.
-    \item Repeat Step 3 until all symbols are connected to the root node.
+    \item Repeat Step 3 until all symbols are connected to the root
+          node.
     \item Assign a 0 to the left branch and a 1 to the right branch.
-    \item Assign the code to each symbol by traversing the tree from the
-          root to the symbol.
+    \item Assign the code to each symbol by traversing the tree from
+          the root to the symbol.
 \end{enumerate}
 Huffman coding is used in the PNG image format, which is a lossless
 image compression format, the ZIP file format, and in some parts of the
@@ -2053,19 +2055,19 @@ Quantisation is a lossy compression technique that reduces the number
 of bits required to represent an image by mapping input values from a
 large set to output values in a smaller set. One common method of
 quantisation is truncation, where the least significant bits of pixel
-values are removed, thereby removing the high frequency components in an
-image. For example, we can take an 8-bit image, which can represent
+values are removed, thereby removing the high frequency components in
+an image. For example, we can take an 8-bit image, which can represent
 \(2^{3 \times 8} = \num{16 777 216}\) unique colours, and truncate each
-colour intensity to 4 bits, reducing the number of colours to
-\(2^{3 \times 4} = 4096\) unique colours.
+colour intensity to 4 bits, reducing the number of colours to \(2^{3
+\times 4} = 4096\) unique colours.
 \subsubsection{Discrete Cosine Transform (DCT)}
 The Discrete Cosine Transform (DCT) is a lossy compression technique
 used in the JPEG image format. The DCT is a type of Fourier transform
 that converts a signal into a sum of cosine functions of different
 frequencies (both horizontally and vertically). The idea is to remove
 components with negligible coefficients, as they do not contribute
-significantly to the image. In practice, the image is divided into
-\(8 \times 8\) pixel blocks, and 64 cosine bases are used to represent
+significantly to the image. In practice, the image is divided into \(8
+\times 8\) pixel blocks, and 64 cosine bases are used to represent
 every possible \(8 \times 8\) block. This process is described below:
 \begin{enumerate}
     \item Divide the image into \(8 \times 8\) blocks.
@@ -2094,5 +2096,161 @@ To reconstruct the image, we can reverse the process:
     \item Compute the inverse DCT of the coefficients.
     \item Repeat for each block.
 \end{enumerate}
+\section{Deep Learning}
+Deep learning allows computational models that are composed of multiple
+processing layers to learn representations of data with multiple levels
+of abstraction. Deep learning methods discover intricate structure in
+large data sets by using the backpropagation algorithm to indicate how
+a machine should change its internal parameters that are used to
+compute the representation in each layer from the representation in the
+previous layer. Deep learning is used in a variety of applications,
+including computer vision, speech recognition, natural language
+processing, and audio recognition.
+\subsection{Supervised Learning}
+Supervised learning is the machine learning task of learning a function
+that maps an input to an output, based on example input-output pairs.
+It infers a function from labelled training data consisting of a set of
+training examples. In the training phase, the model is trained to
+minimise the error between the predicted output and the true output,
+called the \textbf{loss function}. The model can then be evaluated on
+unseen test data to determine how well it generalises to new data.
+\subsubsection{Nearest Neighbours Classifiers}
+A simple image classifier is the nearest neighbours classifier, which
+classifies an image by comparing it to labelled training images and
+finding the class it is most similar to. This algorithm transforms all
+images into an image embedding space, where images are represented by
+an \(N \times M\)-d vector of all pixel intensities. To determine if
+images are similar, we can use a similarity metric such as the
+Euclidean distance or the cosine similarity.
+\subsubsection{Linear Classifiers}
+A linear classifier makes predictions by dividing the input space into
+regions separated by hyperplanes. The model computes a weighted sum of
+the input features and compares it to a threshold to make a prediction.
+The model can be represented as:
+\begin{equation*}
+    \symbf{y} = \symbf{W}^\top \symbf{x} + \symbf{b}
+\end{equation*}
+where \(\symbf{W} \in \R^{K \times p}\) is the weight matrix,
+\(\symbf{x} \in \R^p\) is the input feature vector, and
+\(\symbf{b} \in \R^K\) is the bias term. Here, \(K\) is the
+number of classes and \(p\) is the number of features. The output vector
+\(\symbf{y}\) is a vector of unnormalised log-probabilities for each
+class. The class with the highest score is the predicted class. To
+introduce non-linearity into the model, we often use an activation
+function \(a\) on the output of the linear model:
+\begin{equation*}
+    \symbf{z} = a\left( \symbf{W}^\top \symbf{x} + \symbf{b} \right),
+\end{equation*}
+where the activation function is typically the Rectified Linear Unit
+(ReLU) function:
+\begin{equation*}
+    a\left( x \right) = \mathrm{ReLU}\left( x \right) = \max\left( 0,\: x \right),
+\end{equation*}
+or other functions such as the sigmoid or hyperbolic tangent functions:
+\begin{align*}
+    a\left( x \right) & = \sigma\left( x \right) = \frac{1}{1 + e^{-x}},             \\
+    a\left( x \right) & = \tanh\left( x \right) = \frac{e^x - e^{-x}}{e^x + e^{-x}}.
+\end{align*}
+
+To learn the coefficients in \(\symbf{W}\) and \(\symbf{b}\) we can use
+a \textbf{loss function} to measure the quality of the model's
+predictions. A common loss function is the \textbf{cross-entropy loss},
+which measures the difference between the predicted class probabilities
+and the true class probabilities. The cross-entropy loss for a single
+training example is given by:
+\begin{equation*}
+    L^{\left( i \right)} = -\log{\left( \frac{e^{y_i}}{\sum_j e^{y_j}} \right)} = -y_i + \log{\sum_j e^{y_j}}.
+\end{equation*}
+Here we are talking the logarithm of the softmax function, which is a
+generalisation of the logistic (sigmoid) function that can be used for
+multi-class classification. The softmax function is defined as:
+\begin{equation*}
+    \sigma \left( \symbf{y} \right)_i = \frac{e^{y_i}}{\sum_j e^{y_j}}.
+\end{equation*}
+The cross-entropy loss for the entire training set is called the cost
+which is the average of the loss over all \(n\) training examples:
+\begin{equation*}
+    J = \frac{1}{n} \sum_{i = 1}^n L^{\left( i \right)}.
+\end{equation*}
+Given this cost function, we can use a gradient-based optimisation
+algorithm to tune the weights and biases of the model to minimise the
+cost. One common optimisation algorithm is \textbf{stochastic gradient
+    descent} (SGD):
+\begin{align*}
+    \symbf{W} & \gets \symbf{W} - \eta \pdv{J}{\symbf{W}}, \\
+    \symbf{b} & \gets \symbf{b} - \eta \pdv{J}{\symbf{b}},
+\end{align*}
+where \(\eta\) is the learning rate. To take advantage of computing
+capability, we can introduce many layers into the model to create a
+fully connected neural network.
+\subsubsection{Convolutional Neural Networks (CNNs)}
+When classifying images, we can use convolution kernels to learn
+features from the image data. Convolutional Neural Networks (CNNs) are
+a type of neural network that is well-suited to image classification
+tasks. CNNs use convolutional layers to learn features from the input
+image, and pooling layers to reduce the spatial dimensions of the
+feature maps. A convolution layer has 4 hyperparameters:
+\begin{itemize}
+    \item Number of filters \(K\)
+    \item Filter size \(F\)
+    \item Stride \(S\)
+    \item Padding \(P\)
+\end{itemize}
+Given an input of dimension \(N \times M \times C\), the output has a
+dimension of \(N' \times M' \times K\), where:
+\begin{align*}
+    N' & = \frac{N - F + 2P}{S} + 1, \\
+    M' & = \frac{M - F + 2P}{S} + 1.
+\end{align*}
+The number of parameters is \(F^2 CK\) with \(K\) biases. A pooling
+layer is often applied after a convolutional layer to reduce the spatial
+dimensions of the feature maps.
+\subsubsection{Training}
+Each update step in the backpropagation algorithm can be performed in
+batches or on the entire training set depending on hardware
+availability. An \textbf{epoch} is a single pass through the entire
+training set. The number of updates in an epoch refers to the number of
+batches required to cover the entire training set:
+\begin{equation*}
+    \text{updates per epoch} = \frac{n}{b},
+\end{equation*}
+where \(b\) is the batch size. To decide which epoch to stop training,
+we can use a validation set to monitor the model's performance. This set
+is not used to train the model, but to evaluate the model's performance
+on unseen data, on every epoch. A plot of the training and validation
+loss for each epoch, can be used to determine when to stop training.
+\subsubsection{Gradient Descent Optimisation}
+If the number of training examples is large, it may be infeasible to
+apply gradient descent on the entire training set. We can instead
+consider the following variants of the gradient descent algorithm we
+saw earlier:
+\begin{itemize}
+    \item \textbf{Batch Gradient Descent}: Weights are updated using the
+          gradients of the entire training set. This method is slow and
+          computationally expensive.
+    \item \textbf{Stochastic Gradient Descent (SGD)}: Weights are updated
+          using the gradients of a single training example. This method
+          is noisy and may not converge to the global minimum.
+    \item \textbf{Mini-Batch Gradient Descent}: Weights are updated using
+          the gradients of a small subset of the training set. This
+          method is faster than batch gradient descent and less noisy
+          than stochastic gradient descent.
+\end{itemize}
+To further improve these algorithms, we can introduce momentum to
+accelerate convergence and reduce oscillations around local minima.
+The momentum algorithm is defined as:
+\begin{align*}
+    \symbf{v} & \gets \rho \symbf{v} + \pdv{J}{\symbf{w}}, \\
+    \symbf{w} & \gets \symbf{w} - \eta \symbf{v},
+\end{align*}
+here \(\symbf{w}\) represents both the weights and biases in the model.
+The addition of a velocity term \(\symbf{v}\) allows the model to build
+up velocity as a running mean of the gradients. The hyperparameter
+\(\rho\) controls the momentum term by adding friction, and is typically
+set to a value between 0.9 and 0.99. Other more advanced optimisation
+algorithms include the Nesterov Accelerated Gradient (NAG), AdaGrad,
+RMSprop, and Adam optimisers. These algorithms use adaptive learning
+rates to improve convergence and generalisation. We can also use
+learning rate schedules to adjust the learning rate during training.
 \end{document}
 
