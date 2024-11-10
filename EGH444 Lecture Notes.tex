@@ -4,6 +4,7 @@
 \input{LaTeX-Submodule/template.tex}
 
 % Additional packages & macros
+\DeclareMathOperator*{\argmax}{arg\ max}
 
 % Header and footer
 \newcommand{\unitName}{Digital Signals and Image Processing}
@@ -1283,7 +1284,7 @@ estimate the degradation function using one of the following methods:
     \item \textbf{Observation}: The degradation is assumed to be linear
           and position-invariant. By looking at a small region of the image
           \(g_s\left( x,\: y \right)\) containing sample structures where
-          te signal content is strong (i.e., high contrast), we can process
+          the signal content is strong (i.e., high contrast), we can process
           this sub-image to find the best result \(\hat{f}_s\left( x,\: y \right)\).
           This lets us estimate the degradation function as
           \begin{equation*}
@@ -1324,7 +1325,7 @@ estimate the degradation function using one of the following methods:
 \end{itemize}
 \subsection{Inverse Filtering}
 When restoring an image \(g\left( x,\: y \right)\) that has been
-degradated by some process \(h\left( x,\: y \right)\), we can obtain an
+degraded by some process \(h\left( x,\: y \right)\), we can obtain an
 estimate for the reconstructed image in the frequency domain using
 direct inverse filtering:
 \begin{equation*}
@@ -1354,7 +1355,7 @@ variables. When using the Wiener filter, the following is assumed:
     \item The intensity levels in the estimate are a linear function of
           the levels in the degraded image.
 \end{itemize}
-Then, the mimimum of the error function \(e\) defined:
+Then, the minimum of the error function \(e\) defined:
 \begin{equation*}
     e^2 = \E\left[ \left( f - \hat{f} \right)^2 \right]
 \end{equation*}
@@ -1453,4 +1454,645 @@ simple binary search algorithm to find the optimal value of \(\gamma\):
                     found.
           \end{itemize}
 \end{enumerate}
+\section{Image Features}
+\subsection{Feature Detection}
+Consider the problem of creating a panorama from multiple images. Here
+we want to detect and match features between images so that we can
+align them correctly. There are 5 characteristics for a good feature:
+\begin{itemize}
+    \item \textbf{Locality}: The feature should be localised to a small
+          region of the image, so that it is robust to occlusion and
+          clutter.
+    \item \textbf{Distinctiveness}: The feature should differentiate a
+          large database of objects.
+    \item \textbf{Quantity}: The feature should be present in large
+          quantities in the image.
+    \item \textbf{Efficiency}: The feature should be computationally
+          efficient to compute.
+    \item \textbf{Generality}: The feature should be applicable to a
+          wide range of images.
+\end{itemize}
+Such features should be invariant to:
+\begin{itemize}
+    \item \textbf{Geometric Transformations}:
+          \begin{itemize}
+              \item Rotation
+              \item Similarity transformations (rotation and uniform
+                    scaling)
+              \item Affine transformations (shear and stretching in one
+                    direction)
+          \end{itemize}
+    \item \textbf{Photometric Transformations}:
+          \begin{itemize}
+              \item Affine intensity changes (\(I \to aI + b\))
+          \end{itemize}
+\end{itemize}
+\subsection{Edge Detection}
+While features are useful for matching images, edges are far more
+plentiful and carry important semantic associations. Boundaries of
+objects, which also correspond to occlusion events in 3D (i.e., when an
+object is in front of another), are often delineated by visible
+contours. Other kinds of edges correspond to shadow boundaries or
+crease edges, where surface orientation changes rapidly. We recognise
+edges in images by looking for depth discontinuities, texture
+boundaries, changes in material properties, and illumination changes.
+These points are called \textbf{edge points}.
+
+When designing an edge detection algorithm, we define an edge as a
+location of rapid intensity or colour variation. This can be described
+mathematically through the gradient of the image:
+\begin{equation*}
+    \symbf{\nabla} f =
+    \begin{bmatrix}
+        \displaystyle\pdv{f}{x} \\ \displaystyle\pdv{f}{y}
+    \end{bmatrix}
+    ,
+\end{equation*}
+where the \textbf{gradient direction} is given by:
+\begin{equation*}
+    \theta = \arctan{\left( \frac{\pdv{f}/{y}}{\pdv{f}/{x}} \right)},
+\end{equation*}
+and the \textbf{edge strength} is given by the magnitude of the gradient:
+\begin{equation*}
+    \norm*{\symbf{\nabla} f} = \sqrt{\left( \pdv{f}{x} \right)^2 + \left( \pdv{f}{y} \right)^2}.
+\end{equation*}
+We should note that this operation is sensitive to noise as the gradient
+is a high-pass filter in the frequency domain. To mitigate this, noise
+must be smoothed out prior to edge detection using a low-pass filter.
+It is important that this smoothing operation does not blur edges.
+\subsubsection{Gaussian Edge Detector}
+The Gaussian edge detector is a simple edge detection algorithm that
+uses the derivative of the Gaussian function to detect edges. Here, the
+Gaussian function \(h\left( x,\: y \right)\) acts as the smoothing
+operator, and the gradient operator is used to detect edges. This
+operation is summarised by the following equation:
+\begin{equation*}
+    g\left( x,\: y \right) = \symbf{\nabla} \left( h \ast f \right) = \left( \symbf{\nabla} h \right) \ast f.
+\end{equation*}
+Once we have found \(g\), we can threshold the gradient magnitude to
+obtain the edge map.
+\subsubsection{Sobel Edge Detector}
+The Sobel edge detector uses a Sobel filter which is the product of a
+vertical smoothing operator and a horizontal second-order derivative
+operator:
+\begin{equation*}
+    S =
+    \begin{bmatrix}
+        -1 & 0 & 1 \\ -2 & 0 & 2 \\ -1 & 0 & 1
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        1 \\ 2 \\ 1
+    \end{bmatrix}
+    \begin{bmatrix}
+        -1 & 0 & 1
+    \end{bmatrix}
+    .
+\end{equation*}
+\subsubsection{Edge Thinning}
+The Sobel filter is effective at detecting edges, but it may produce
+edges that are thicker than desired. To thin these edges, we can use
+\textbf{non-maxima suppression}. This is done by considering the
+gradient direction and suppressing all non-maximal gradient values in
+the direction tangent to the gradient. However, this may result in
+disconnected edges, as this process is applied locally.
+\subsubsection{Edge Linking}
+If a low threshold is used, the edge map may contain many weak edges,
+where edges are not continuous. To address this, we can use
+\textbf{edge linking} to connect these weak edges. This is done by
+considering the tangent direction of the gradient and following the
+direction to predict the next edge point. This process is repeated
+until the edge is complete. One common algorithm for edge linking is
+the \textbf{hysteresis thresholding} algorithm, where we start with a
+high threshold to obtain edge curves and lower it until we have a
+complete edge map.
+\subsubsection{Canny Edge Detector}
+The Canny edge detector is a multi-step edge detection algorithm that
+aims to find the optimal edge map by considering the following
+criteria:
+\begin{itemize}
+    \item \textbf{Good Detection}: The edge detector minimises the
+          number of false positives and false negatives.
+    \item \textbf{Good Localisation}: The edge detector must be as close
+          as possible to the true edge.
+    \item \textbf{Single Response}: The edge detector should only
+          return one point for each true edge point.
+\end{itemize}
+The canny edge detector is composed of the following steps:
+\begin{enumerate}
+    \item Filter an image with the derivative of a Gaussian function.
+    \item Find the gradient magnitude and direction.
+    \item Apply non-maxima suppression to thin the edges.
+    \item Apply hysteresis thresholding to remove weak edges.
+\end{enumerate}
+\subsection{Corner Detection}
+Corners are important features in images that have a gradient in two or
+more dominant directions. Corners are both \textbf{repeatable} and
+\textbf{distinctive}, making them ideal for image matching.
+\subsubsection{Harris Corner Detector}
+The Harris corner detector is a popular corner detection algorithm that
+uses the auto correlation of the image gradient in two directions to
+detect corners. Consider the change in intensity when an image is
+shifted by \(\left( s,\: t \right)\):
+\begin{equation*}
+    E\left( x,\: y \right) = \sum_{\left( s,\: t \right) \in W} w\left( s,\: t \right) \left[ f\left( x + s,\: y + t \right) - f\left( x,\: y \right) \right]^2,
+\end{equation*}
+where \(W\) is a window around the pixel \(\left( x,\: y \right)\),
+\(w\left( s,\: t \right)\) is a window function such as a uniform weight
+function or the Gaussian function, and \(f\left( x,\: y \right)\) is the
+image intensity at \(\left( x,\: y \right)\). The Harris corner detector
+aims to maximise this function to detect corners. For small shifts, we
+can use the Taylor series expansion to approximate the change in
+intensity, leading to the following expression:
+\begin{equation*}
+    E\left( x,\: y \right) \approx \symbf{v}^\top \symbf{M} \symbf{v},
+\end{equation*}
+where \(\symbf{v} = \left[ u,\: v \right]^\top\) is the shift vector,
+and \(\symbf{M}\) is the auto-correlation matrix of the image gradient:
+\begin{equation*}
+    \symbf{M} = \sum_{\left( s,\: t \right) \in W} w\left( s,\: t \right)
+    \begin{bmatrix}
+        f_x^2 & f_x f_y \\ f_x f_y & f_y^2
+    \end{bmatrix}
+    ,
+\end{equation*}
+If we consider the eigenvalues of \(\symbf{M}\), we can visualise an
+ellipse that represents the change in intensity.
+\begin{itemize}
+    \item If \(\lambda_1 \gg \lambda_2\) then the point can be
+          classified as an edge. The larger eigenvalue \(\lambda_1\)
+          corresponds to the direction of the maximum change in
+          intensity. The radius of the ellipse along the minor axis is
+          equal to \(\lambda_1^{-1/2}\), whereas the radius of the
+          ellipse along the major axis is equal to
+          \(\lambda_2^{-1/2}\).
+    \item When \(\lambda_1\) and \(\lambda_2\) are both small, the
+          point is likely to be a flat region.
+    \item If \(\lambda_1\) and \(\lambda_2\) are large, the point is
+          likely to be a corner and \(E\) increases rapidly in all
+          directions.
+\end{itemize}
+We can also define a measure of \textbf{corner response} as follows:
+\begin{equation*}
+    R = \det{\symbf{M}} - k \left( \Tr{\symbf{M}} \right)^2,
+\end{equation*}
+where a high value of \(R\) determines how strong the corner is. Here
+\(k\) is an empirical constant that ranges between 0.04 and 0.06.
+Similar to the above list, we can classify corners based on the value of
+\(R\):
+\begin{itemize}
+    \item When \(R < 0\), the point is an edge.
+    \item When \(\abs*{R}\) is small, the region is flat.
+    \item When \(R > 0\), the point is a corner.
+\end{itemize}
+Therefore we can summarise the Harris corner detection algorithm with
+the following steps:
+\begin{enumerate}
+    \item Compute the Gaussian derivatives of the image.
+    \item Compute the auto-correlation matrix \(\symbf{M}\) around each
+          pixel.
+    \item Compute the corner response \(R\) for each pixel.
+    \item Threshold the corner response to obtain the corner map.
+    \item Apply non-maxima suppression to thin the corners.
+\end{enumerate}
+One key advantage of the Harris corner detector is that it is rotation
+invariant, as the eigenvalues of \(\symbf{M}\) are invariant to
+rotations in the image. This means that two corners that are rotated
+will produce the same eigenvalues. However, the Harris corner detector
+is not scale invariant, as zooming into a corner will cause the corner
+to become an edge.
+\subsubsection{Scale Invariant Feature Transform (SIFT)}
+The SIFT algorithm is a feature detection algorithm that is both scale
+and rotation invariant. The SIFT algorithm is composed of the following
+steps:
+\begin{enumerate}
+    \item \textbf{Gaussian Scale-Space}: The image is convolved with
+          Gaussian filters at different variances to create a scale
+          space.
+    \item \textbf{Difference of Gaussians (DoG)}: The difference
+          between two adjacent scales in the scale space is computed.
+    \item \textbf{Non-Maxima Suppression}: Local maxima and minima are
+          detected in the DoG space.
+\end{enumerate}
+To find the interest points, the algorithm then uses thresholding to
+remove weak candidates, keeping only the points for which the Laplacian
+is extremal.
+\section{Image Segmentation}
+Image segmentation is the process of partitioning an image into
+multiple image segments. Edges and corners are useful for detecting
+features in images, but often boundaries of interest are
+\textbf{fragmented}. In such cases we can use colour and texture
+information to segment the image. We can use two approaches to segment
+images:
+\begin{itemize}
+    \item \textbf{Region-Based Segmentation}: This approach groups
+          pixels based on their similarity. Here we can use unsupervised
+          learning techniques such as clustering to segment the image.
+    \item \textbf{Object-Based Segmentation}: This approach separates
+          an image into objects that were learned from a supervised learning
+          process.
+\end{itemize}
+\subsection{Segmentation by Thresholding}
+Thresholding is a simple image segmentation technique that separates
+pixels into two classes based on their intensity values. Regions with
+uniform intensities have strong peaks in their intensity histograms,
+but in general, a good threshold only requires peaks separated by
+valleys.
+\subsubsection{Otsu's Method}
+Otsu's method is a technique that finds the optimal threshold by
+minimising the intra-class variance of the image, or by maximising the
+inter-class variance. Given the threshold intensity value \(T = k\),
+the algorithm is as follows:
+\begin{enumerate}
+    \item Compute the normalised histogram of the image.
+    \item Compute the class probabilities, \(P_1\left( k \right)\) and
+          \(P_2\left( k \right)\), as
+          \begin{equation*}
+              P_1\left( k \right) = \sum_{i = 0}^k p\left( i \right) \quad \text{and} \quad P_2\left( k \right) = \sum_{i = k + 1}^{L - 1} p\left( i \right),
+          \end{equation*}
+          where \(p\left( i \right)\) is the \(i\)th histogram component
+          (i.e., the pdf of the \(i\) intensity value). Note \(P_1 + P_2 = 1\).
+    \item Compute the class means, \(m_1\) and \(m_2\), as
+          \begin{equation*}
+              m_1 = \sum_{i = 0}^k \frac{i p\left( i \right)}{P_1} \quad \text{and} \quad m_2 = \sum_{i = k + 1}^{L - 1} \frac{i p\left( i \right)}{P_2}.
+          \end{equation*}
+    \item Compute the global mean, \(m_G\), as
+          \begin{equation*}
+              m_G = \sum_{i = 0}^{L - 1} i p\left( i \right) = P_1 m_1 + P_2 m_2.
+          \end{equation*}
+    \item Compute the global variance, \(\sigma_G^2\), as
+          \begin{equation*}
+              \sigma_G^2 = \sum_{i = 0}^{L - 1} \left( i - m_G \right)^2 p\left( i \right) = P_1 \sigma_1^2 + P_2 \sigma_2^2 + P_1 \left( m_1 - m_G \right)^2 + P_2 \left( m_2 - m_G \right)^2.
+          \end{equation*}
+          and define the intra-class (within-class) variance as
+          \begin{equation*}
+              \sigma_w^2 = P_1 \sigma_1^2 + P_2 \sigma_2^2.
+          \end{equation*}
+          and the inter-class (between-class) variance as
+          \begin{equation*}
+              \sigma_B^2 = P_1 \left( m_1 - m_G \right)^2 + P_2 \left( m_2 - m_G \right)^2 = P_1 P_2 \left( m_1 - m_2 \right)^2 = \frac{\left( m_G P_1 - m \right)^2}{P_1 \left( 1 - P_1 \right)}.
+          \end{equation*}
+          where \(m\) is the cumulative mean (average intensity) up to
+          the threshold \(k\), defined as
+          \begin{equation*}
+              m = \sum_{i = 0}^k i p\left( i \right).
+          \end{equation*}
+    \item The optimal threshold is the value of \(k\) that maximises
+          \(\sigma_B^2\):
+          \begin{equation*}
+              k = \argmax_{k^\ast} \sigma_B^2 \left( k^\ast \right).
+          \end{equation*}
+\end{enumerate}
+For noisy images, it may be beneficial to smooth the histogram before
+applying Otsu's method, however this is not effective for images with
+a very small foreground region. For local thresholds, we can compute the
+gradient using the Laplacian of the image and only apply Otsu's method
+to nearby pixels.
+\subsubsection{Multiple Thresholding}
+When there is more than one object in the same background, the
+histogram may become multimodal, and multiple thresholds may be
+required. Here we can assign pixels as follows:
+\begin{itemize}
+    \item If \(f\left( x,\: y \right) < T_1\), assign the pixel to
+          class 1.
+    \item If \(T_1 \leq f\left( x,\: y \right) < T_2\), assign the
+          pixel to class 2.
+    \item If \(T_2 \leq f\left( x,\: y \right) < T_3\), assign the
+          pixel to class 3.
+\end{itemize}
+Otsu's method can be extended to 3 classes by searching for values
+\(k_1\) and \(k_2\) that maximise the inter-class variance:
+\begin{equation*}
+    \left( k_1,\: k_2 \right) = \argmax_{0 < k_1 < k_2 < L - 1} \sigma_B^2\left( k_1,\: k_2 \right)
+\end{equation*}
+This can be found using a simple grid search algorithm:
+\begin{enumerate}
+    \item Select the first value of \(k_1\) (\(k_1 = 1\)).
+    \item Iterate \(k_2\) over all values from \(k_1 + 1\) to \(L -
+          2\).
+    \item Increment \(k_1\) by 1.
+    \item Calculate \(\sigma_B^2\left( k_1,\: k_2 \right)\).
+    \item Repeat Steps 2--4 until \(k_1 = L - 3\).
+\end{enumerate}
+\subsection{Active Contours}
+Active contours, also known as snakes, are curves that can move within
+an image to fit to object boundaries. These curves are defined by a set
+of points, and are iteratively adjusted so as to:
+\begin{itemize}
+    \item be near image positions with high gradients, and
+    \item satisfy shape ``preferences'' or contour priors.
+\end{itemize}
+Active contours are comparable to the Hough transform,
+\begin{itemize}
+    \item \textbf{Hough transform}:
+          \begin{itemize}
+              \item Rigid model shape.
+              \item Single voting pass can detect multiple instances.
+          \end{itemize}
+    \item \textbf{Active contours}:
+          \begin{itemize}
+              \item Prior on shape types, but shape can be iteratively
+                    adjusted (deformations).
+              \item Requires initialisation near the object boundary.
+              \item One optimisation ``pass'' is required to fit a
+                    single contour.
+          \end{itemize}
+\end{itemize}
+\subsubsection{Energy Function}
+Active contours are defined by an energy function that is minimised to
+obtain the optimal contour. The total energy (cost) of the current
+snake is defined as the sum of the internal energy and the external
+energy:
+\begin{equation*}
+    E = E_{\text{internal}} + E_{\text{external}}.
+\end{equation*}
+The internal energy encourages prior shape preferences, e.g., smoothness,
+elasticity, a particular known shape. The external energy encourages
+the contour to fit on places where image structures exist, e.g., edges.
+A good fit between the \textbf{current deformable contour} and the
+target shape in the image will yield a \textit{low} energy value.
+
+Given the gradient images \(g_x\) and \(g_y\), the external energy at a
+point on the curve is defined as:
+\begin{equation*}
+    E_{\text{external}}\left( \symbf{v} \right) = -\left( \abs*{g_x\left( \symbf{v} \right)}^2 + \abs*{g_y\left( \symbf{v} \right)}^2 \right),
+\end{equation*}
+and the external energy for the entire curve is defined as:
+\begin{equation*}
+    E_{\text{external}} = - \sum_{i = 0}^{n - 1} \left( \abs*{g_x\left( \symbf{v}_i \right)}^2 + \abs*{g_y\left( \symbf{v}_i \right)}^2 \right),
+\end{equation*}
+where \(\symbf{v}_i\) is the \(i\)th point on the curve. The internal
+energy at a point on the curve is defined as:
+\begin{equation*}
+    E_{\text{internal}}\left( \symbf{v} \right) = \alpha \norm*{\odv{\symbf{v}'\left( s \right)}{s}}^2 + \beta \norm*{\odv[order=2]{\symbf{v}\left( s \right)}{s}}^2,
+\end{equation*}
+where the first term represents the tension or elasticity of the curve,
+and the second term represents the stiffness or curvature of the curve.
+The internal energy for the entire curve is defined as:
+\begin{equation*}
+    E_{\text{internal}} = \sum_{i = 0}^{n - 1} \left[ \alpha \norm*{\odv{\symbf{v}'\left( s \right)}{s}}^2 + \beta \norm*{\odv[order=2]{\symbf{v}\left( s \right)}{s}}^2 \right].
+\end{equation*}
+Note we can approximate these derivatives using finite differences:
+\begin{align*}
+    E_{\text{internal}}\left( \symbf{v} \right) & = \alpha \norm*{\symbf{v}_{i + 1} - \symbf{v}_i}^2 + \beta \norm*{\symbf{v}_{i + 1} - 2 \symbf{v}_i + \symbf{v}_{i - 1}}^2                                      \\
+    E_{\text{internal}}                         & = \sum_{i = 0}^{n - 1} \left[ \alpha \norm*{\symbf{v}_{i + 1} - \symbf{v}_i}^2 + \beta \norm*{\symbf{v}_{i + 1} - 2 \symbf{v}_i + \symbf{v}_{i - 1}}^2 \right].
+\end{align*}
+To capture some smooth variation on a known shape, we can add a term
+that penalises deviation from that shape:
+\begin{equation*}
+    E_{\text{internal}} = \sum_{i = 0}^{n - 1} \left[ \alpha \norm*{\symbf{v}_{i + 1} - \symbf{v}_i}^2 + \beta \norm*{\symbf{v}_{i + 1} - 2 \symbf{v}_i + \symbf{v}_{i - 1}}^2 \right] + \alpha \sum_{i = 0}^{n - 1} \norm*{\symbf{v}_i - \hat{\symbf{v}}_i}^2,
+\end{equation*}
+where \(\hat{\symbf{v}}_i\) are points on the known shape.
+\subsubsection{Energy Minimisation}
+We will consider two methods for energy minimisation:
+\begin{itemize}
+    \item \textbf{Greedy Search}: Create a search windows around each
+          point and move the point to a position where the energy function is
+          minimised. This is repeated until the points stop moving or after
+          a fixed number of iterations. This method does not guarantee
+          convergence to the global minimum and requires a good initialisation.
+    \item \textbf{Dynamic Programming}: This method uses a dynamic
+          programming algorithm called the Viterbi algorithm to find the
+          optimal path. This is useful for optimising 2D snakes.
+\end{itemize}
+\subsubsection{Limitations}
+Active contours have several limitations:
+\begin{itemize}
+    \item They may over-smooth boundaries
+    \item They cannot follow topological changes of objects
+    \item The snake does not see object boundaries unless it is close
+          to them
+\end{itemize}
+To summarise, active contours are useful for:
+\begin{itemize}
+    \item Segmentation of objects with smooth boundaries
+    \item Tracking objects in a sequence of images, where the previous
+          frame can be used as the initialisation for the next frame
+\end{itemize}
+\subsection{\texorpdfstring{\(k\)}{k}-Means Clustering}
+The \(k\)-means clustering algorithm is an unsupervised learning
+algorithm that partitions an image into \(k\) clusters. Intensities
+are assigned to the cluster with the nearest mean intensity. The
+algorithm is as follows:
+\begin{enumerate}
+    \item Randomly initialise \(k\) cluster centres.
+    \item Assign each pixel to the nearest cluster centre.
+    \item Update the cluster centres by computing the mean intensity of
+          the pixels in each cluster.
+    \item Repeat Steps 2 and 3 until convergence.
+\end{enumerate}
+Here we can choose to cluster based on the individual colour channels
+and also pixel position to enforce spatial coherence. However, this may
+not be enough to distinguish all regions. Depending on the feature space,
+we can group pixels in different ways.
+\subsubsection{Pros and Cons}
+\begin{itemize}
+    \item \textbf{Pros}:
+          \begin{itemize}
+              \item Simple and easy to implement.
+              \item Fast and efficient.
+          \end{itemize}
+    \item \textbf{Cons}:
+          \begin{itemize}
+              \item Requires the number of clusters \(k\) to be
+                    specified.
+              \item Sensitive to initial centers.
+              \item Sensitive to outliers.
+              \item Detects spherical clusters (due to the Euclidean
+                    distance metric).
+              \item Assumes mean can be computed.
+          \end{itemize}
+\end{itemize}
+\subsubsection{Mean-Shift Clustering}
+The mean-shift clustering algorithm is a non-parametric clustering
+algorithm that seeks modes or local maxima of density in the feature
+space. It works by iteratively shifting each data point to the mean of
+the data points within a certain radius. The algorithm is as follows:
+\begin{enumerate}
+    \item Convert the image into tokens (via colour, gradients,
+          texture, etc.)
+    \item Chose initial search window locations uniformly in the data.
+    \item Compute the mean shift window location for each initial
+          position.
+    \item Merge windows that end up on the same ``peak'' or mode.
+    \item The data these merged windows traversed are assigned to the
+          same cluster.
+\end{enumerate}
+The advantages of mean-shift clustering are that it:
+\begin{itemize}
+    \item Does not assume shape on the clusters.
+    \item Only requires a single parameter, the window size.
+    \item Is a generic technique that can be applied to any feature
+          space.
+    \item Can be used to find multiple modes in the data.
+\end{itemize}
+Some disadvantages are that:
+\begin{itemize}
+    \item We need to select the window size.
+    \item The algorithm does not scale well with the dimension of the
+          feature space.
+    \item The algorithm is computationally expensive.
+\end{itemize}
+\section{Image Compression}
+Image compression is a type of data compression applied to digital
+images to reduce their cost for storage or transmission. Consider the
+amount of memory required to store the data in a standard 1 hour long
+4K movie:
+\begin{align*}
+    \text{Memory} & = \text{Resolution} \times \text{Colour Depth} \times \text{Frame Rate} \times \text{Time}                                               \\
+                  & = \left( 3840 \times 2160 \right) \unit{px} \times \qty{24}{bit/px} \times \qty{30}{frame/s} \times \left( 60 \times 60 \right) \unit{s} \\
+                  & = \qty{21499084800000}{bit}                                                                                                              \\
+                  & = \qty{2687385600000}{byte}                                                                                                              \\
+                  & = \qty{2624400000}{K.byte}                                                                                                               \\
+                  & = \qty{2562890.625}{M.byte}                                                                                                              \\
+                  & \approx \qty{2502.823}{G.byte}                                                                                                           \\
+                  & \approx \qty{2.444}{T.byte}.
+\end{align*}
+This is clearly an unfeasible amount of memory to store a single movie,
+and we are not even considering audio data. Therefore let us discuss
+some techniques that will allow us to reduce the amount of memory
+required to store such data.
+\subsection{Compression}
+Data compression is used to reduce the amount of data required to
+represent some information. Data compression can be used for both
+transmission and storage of data, and encompasses all kinds of digital
+information, including text, images, audio, and video.
+\begin{definition}[Compression Ratio]
+    The \textbf{compression ratio} is the ratio of the size of the
+    compressed data to the size of the original data.
+    \begin{equation*}
+        \text{Compression Ratio} = \frac{\text{Size of Uncompressed Data}}{\text{Size of Compressed Data}}.
+    \end{equation*}
+\end{definition}
+Compression works by removing redundancy in data. For an image, this can
+be done by removing:
+\begin{itemize}
+    \item \textbf{Coding Redundancy}: where an image contains more bits
+    than necessary to represent information. For example, using an 8-bit
+    image representation when only 4 intensity values are present in an
+    image.
+    \item \textbf{Spatial Redundancy}: when many neighbouring pixels
+    have the same value.
+\end{itemize}
+There are two types of data compression:
+\begin{itemize}
+    \item \textbf{Lossless Compression}: This type of compression
+          reduces the size of the data without losing any information.
+          As such, lossless compression is reversible.
+    \item \textbf{Lossy Compression}: This type of compression reduces
+          the size of the data by removing redundant information. This
+            results in a loss of information, but is usually not
+            perceptible. Due to this, lossy compression is irreversible.
+\end{itemize}
+\subsection{Lossless Compression}
+\subsubsection{Run-Length Encoding}
+Run-length encoding is a simple form of lossless data compression that
+compresses sequences of the same value. It represents runs of identical
+intensities as \textbf{run-length} pairs, where each pair specifies the
+start of a new intensity and the number of consecutive pixels that have
+that intensity. For example, given a sequence of black and white pixels,
+\begin{equation*}
+    \left[ w w w w b b b w w w \right] \to \left[ 4w 3b 3w \right].
+\end{equation*}
+\subsubsection{Huffman Coding}
+If we consider a simple image with a limited number of colours, we can
+improve the compression ratio of run-length encoding by representing
+colour values with a unique code. For example, an image with 4 colours,
+white, red, blue, and green, can be represented by the following codes:
+\begin{align*}
+    \text{White} & : 00, \\
+    \text{Red}   & : 01, \\
+    \text{Blue}  & : 10, \\
+    \text{Green} & : 11,
+\end{align*}
+rather than using 24 bits to represent each pixel. The Huffman coding
+algorithm is a lossless data compression algorithm that uses variable
+length codes to represent data, where the most frequent symbols are
+represented by shorter codes. This code is generated using a Huffman
+tree, which is known by both the encoder and decoder. The algorithm is
+as follows:
+\begin{enumerate}
+    \item Determine the frequency of each symbol in the data.
+    \item Sort the symbols by frequency.
+    \item For the two least frequent symbols, create a new parent node
+          with a frequency equal to the sum of the two symbols.
+    \item Repeat Step 3 until all symbols are connected to the root node.
+    \item Assign a 0 to the left branch and a 1 to the right branch.
+    \item Assign the code to each symbol by traversing the tree from the
+          root to the symbol.
+\end{enumerate}
+Huffman coding is used in the PNG image format, which is a lossless
+image compression format, the ZIP file format, and in some parts of the
+JPEG image format.
+\begin{definition}[Shannon Information Content]
+    The \textbf{Shannon information content} of a symbol \(x\) is the
+    number of bits required to represent the symbol.
+    \begin{equation*}
+        I\left( x \right) = -\log_2{p\left( x \right)},
+    \end{equation*}
+    where \(p\left( x \right)\) is the probability of the symbol \(x\).
+\end{definition}
+\begin{definition}[Entropy]
+    The \textbf{entropy} of a message gives us the average number of
+    bits needed to transmit each symbol from the message.
+    \begin{equation*}
+        H\left( X \right) = \sum_{x \in X} p\left( x \right) I\left( x \right) = -\sum_{x \in X} p\left( x \right) \log_2{p\left( x \right)},
+    \end{equation*}
+    where \(X\) is the set of all symbols in the source. It also
+    measures the average information carried by each symbol in the
+    message, and is a \textbf{lower bound} on the expected length of
+    each symbol of a compressed message.
+\end{definition}
+\subsection{Lossy Compression}
+The aim of lossy compression is identify the most and least salient
+components of an image with respect to human perception. The least
+salient components are then removed to reduce the amount of data
+required to represent the image.
+\subsubsection{Quantisation}
+Quantisation is a lossy compression technique that reduces the number
+of bits required to represent an image by mapping input values from a
+large set to output values in a smaller set. One common method of
+quantisation is truncation, where the least significant bits of pixel
+values are removed, thereby removing the high frequency components in an
+image. For example, we can take an 8-bit image, which can represent
+\(2^{3 \times 8} = \num{16 777 216}\) unique colours, and truncate each
+colour intensity to 4 bits, reducing the number of colours to
+\(2^{3 \times 4} = 4096\) unique colours.
+\subsubsection{Discrete Cosine Transform (DCT)}
+The Discrete Cosine Transform (DCT) is a lossy compression technique
+used in the JPEG image format. The DCT is a type of Fourier transform
+that converts a signal into a sum of cosine functions of different
+frequencies (both horizontally and vertically). The idea is to remove
+components with negligible coefficients, as they do not contribute
+significantly to the image. In practice, the image is divided into
+\(8 \times 8\) pixel blocks, and 64 cosine bases are used to represent
+every possible \(8 \times 8\) block. This process is described below:
+\begin{enumerate}
+    \item Divide the image into \(8 \times 8\) blocks.
+    \item Compute the DCT of each block.
+    \item For each block, divide the coefficients by a pre-defined
+          quantisation matrix, rounding values to the nearest integer.
+    \item Store the quantised coefficients in a zig-zag order, starting
+          from the top-left corner.
+\end{enumerate}
+When storing these quantised coefficients, we can use a combination of
+Huffman coding, for the non-zero coefficients, and run-length encoding,
+for all remaining coefficients. We use a special \textbf{end-of-block}
+symbol to indicate the end of the Huffman block, after which we only
+expect zero coefficients. An example of the zig-zag order is shown
+below for an \(8 \times 8\) block:
+\begin{figure}[H]
+    \centering
+    \includegraphics[height = 6cm]{figures/zig-zag.pdf}
+    % \caption{} % \label{}
+\end{figure}
+To reconstruct the image, we can reverse the process:
+\begin{enumerate}
+    \item Reconstruct the quantised coefficients into an \(8 \times 8\)
+          matrix.
+    \item Multiply the coefficients by the quantisation matrix.
+    \item Compute the inverse DCT of the coefficients.
+    \item Repeat for each block.
+\end{enumerate}
 \end{document}
+
