@@ -179,7 +179,7 @@ where
     L_{\text{min}} \leqslant \ell \leqslant L_{\text{max}}, \quad L_{\text{min}} = i_{\text{min}} r_{\text{min}}, \quad L_{\text{max}} = i_{\text{max}} r_{\text{max}}.
 \end{equation*}
 The range of intensity values \(\interval{L_{\text{min}}}{L_{\text{max}}}\)
-is called the \textbf{intensity/gray scale}. Commonly, this interval is
+is called the \textbf{intensity/grey scale}. Commonly, this interval is
 transformed to the interval \(\interval{0}{L-1}\), where \(L\) is the
 number of intensity levels.
 \subsection{Image Sampling and Quantisation}
@@ -790,7 +790,7 @@ Let us then define the filter \(H\left( u,\: v \right)\) as
 \begin{equation*}
     H\left( u,\: v \right) = -4 \pi^2 \left( u^2 + v^2 \right),
 \end{equation*}
-or, with respect to the center of the frequency rectangle,
+or, with respect to the centre of the frequency rectangle,
 \begin{equation*}
     H\left( u,\: v \right) = -4 \pi^2 \left( \left( u - P/2 \right)^2 + \left( v - Q/2 \right)^2 \right) = -4\pi D^2\left( u,\: v \right).
 \end{equation*}
@@ -838,12 +838,12 @@ where \(D_0\) is the centre frequency and \(W\) is the width of the band.
 Notch filters are used to remove frequencies in a predefined
 neighbourhood of the frequency rectangle (rather than being centred at
 the origin). Zero-phase-shift filters must be symmetric about the
-origin, so a notch filter transfer function with center frequencies
+origin, so a notch filter transfer function with centre frequencies
 \(\left( u_0,\: v_0 \right)\) must have a corresponding notch filter
-transfer function with center frequencies \(\left( -u_0,\: -v_0
+transfer function with centre frequencies \(\left( -u_0,\: -v_0
 \right)\). The transfer function of a notch filter is constructed by
 multiplying the transfer functions of two highpass filter transfer
-functions whose centers have been translated to the centers of the
+functions whose centres have been translated to the centres of the
 notches. The general form for a notch filter with \(Q\) notches is
 \begin{equation*}
     H\left( u,\: v \right) = \prod_{k=1}^Q H_k\left( u,\: v \right) H_{-k}\left( u,\: v \right),
@@ -888,7 +888,7 @@ Colour can be characterised by three attributes:
 Hue and saturation can also be combined to form the \textbf{chromaticity}
 of a colour.
 \subsection{Colour Models}
-Colour models, or color spaces, are coordinate system for representing
+Colour models, or colour spaces, are coordinate system for representing
 colours mathematically. Some common colour spaces include:
 \begin{itemize}
     \item \textbf{RGB}: The most common colour space, which represents
@@ -1430,7 +1430,7 @@ Laplacian kernel, and is the Fourier transform of the function:
     .
 \end{equation*}
 Note that \(P\) and \(H\) must be of the same size. If \(H\) has
-dimensions \(M \times N\), then \(p\) must be embedded in the center of
+dimensions \(M \times N\), then \(p\) must be embedded in the centre of
 an \(M \times N\) array of zeros. In order to preserve the even symmetry
 of \(p\), \(M\) and \(N\) must both be even integers. To compute the
 parameter \(\gamma\) iteratively, we can use the following algorithm
@@ -1896,7 +1896,7 @@ we can group pixels in different ways.
           \begin{itemize}
               \item Requires the number of clusters \(k\) to be
                     specified.
-              \item Sensitive to initial centers.
+              \item Sensitive to initial centres.
               \item Sensitive to outliers.
               \item Detects spherical clusters (due to the Euclidean
                     distance metric).
